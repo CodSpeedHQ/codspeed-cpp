@@ -2,7 +2,6 @@
 #define CODSPEED_PICOBENCH_COMPAT_HPP_INCLUDED
 
 #include "picobench/picobench.hpp"
-#include <iostream>
 
 // Undefine the original PICOBENCH macro
 // #undef PICOBENCH
