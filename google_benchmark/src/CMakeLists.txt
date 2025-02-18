@@ -82,13 +82,18 @@ set_target_properties(benchmark_main PROPERTIES
 )
 target_link_libraries(benchmark_main PUBLIC benchmark::benchmark)
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/../core codspeed)
+
+target_link_libraries(benchmark PRIVATE codspeed)
+
 set(generated_dir "${PROJECT_BINARY_DIR}")
 
 set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
 set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
 set(pkg_config "${generated_dir}/${PROJECT_NAME}.pc")
 set(pkg_config_main "${generated_dir}/${PROJECT_NAME}_main.pc")
-set(targets_to_export benchmark benchmark_main)
+# TODO: Find a way to not expose codspeed headers to downstream users
+set(targets_to_export benchmark benchmark_main codspeed)
 set(targets_export_name "${PROJECT_NAME}Targets")
 
 set(namespace "${PROJECT_NAME}::")
