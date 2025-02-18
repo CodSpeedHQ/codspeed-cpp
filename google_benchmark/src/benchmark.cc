@@ -16,6 +16,7 @@
 
 #include "benchmark_api_internal.h"
 #include "benchmark_runner.h"
+#include "codspeed.h"
 #include "internal_macros.h"
 
 #ifndef BENCHMARK_OS_WINDOWS
@@ -380,6 +381,8 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
                    BenchmarkReporter* file_reporter) {
   // Note the file_reporter can be null.
   BM_CHECK(display_reporter != nullptr);
+
+  hello_codspeed();
 
   // Determine the width of the name field using a minimum width of 10.
   bool might_have_aggregates = FLAGS_benchmark_repetitions > 1;
