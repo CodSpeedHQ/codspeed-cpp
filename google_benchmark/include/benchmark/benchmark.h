@@ -171,6 +171,7 @@ BENCHMARK(BM_test)->Unit(benchmark::kMillisecond);
 #include <cstddef>
 #include <initializer_list>
 #include <iosfwd>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <memory>
@@ -1437,11 +1438,23 @@ class Fixture : public internal::Benchmark {
   static ::benchmark::internal::Benchmark const* const BENCHMARK_PRIVATE_NAME( \
       n) [[maybe_unused]]
 
+#ifdef CODSPEED_INSTRUMENTATION
+#include <filesystem>
+#define BENCHMARK(...)                                                   \
+  BENCHMARK_PRIVATE_DECLARE(_benchmark_) =                               \
+      (::benchmark::internal::RegisterBenchmarkInternal(                 \
+          std::make_unique<::benchmark::internal::FunctionBenchmark>(    \
+              std::filesystem::relative(__FILE__, CODSPEED_GIT_ROOT_DIR) \
+                      .string() +                                        \
+                  "::" + #__VA_ARGS__,                                   \
+              __VA_ARGS__)))
+#else
 #define BENCHMARK(...)                                                \
   BENCHMARK_PRIVATE_DECLARE(_benchmark_) =                            \
       (::benchmark::internal::RegisterBenchmarkInternal(              \
           std::make_unique<::benchmark::internal::FunctionBenchmark>( \
               #__VA_ARGS__, __VA_ARGS__)))
+#endif
 
 // Old-style macros
 #define BENCHMARK_WITH_ARG(n, a) BENCHMARK(n)->Arg((a))
