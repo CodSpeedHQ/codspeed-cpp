@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  instrumentation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Cache build
+      uses: actions/cache@v3
+      with:
+        path: examples/google_benchmark/build-instrumentation
+        key: ${{ runner.os }}-build-instrumentation-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark/**') }}
+
+    - name: Create build directory
+      run: mkdir -p examples/google_benchmark/build-instrumentation
+
+    - name: Build instrumentation benchmark example
+      run: |
+        cd examples/google_benchmark/build-instrumentation
+        cmake -DCODSPEED_MODE=instrumentation ..
+        make -j
+
+    - name: Run the benchmarks
+      uses: CodSpeedHQ/action@main
+      with:
+        run: examples/google_benchmark/build-instrumentation/benchmark_example
+        token: ${{ secrets.CODSPEED_TOKEN }}
+
+  build-walltime:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Cache build
+      uses: actions/cache@v3
+      with:
+        path: examples/google_benchmark/build-walltime
+        key: ${{ runner.os }}-build-walltime-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark/**') }}
+
+    - name: Create build directory
+      run: mkdir -p examples/google_benchmark/build-walltime
+
+    - name: Build walltime benchmark example
+      run: |
+        cd examples/google_benchmark/build-walltime
+        cmake -DCODSPEED_MODE=walltime ..
+        make -j
