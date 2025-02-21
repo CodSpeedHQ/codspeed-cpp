@@ -16,6 +16,15 @@
 
 namespace benchmark {
 
+#ifdef CODSPEED_INSTRUMENTATION
+BENCHMARK_EXPORT std::string BenchmarkName::str() const {
+  if (args.empty()) {
+    return function_name;
+  }
+
+  return function_name + "[" + args + "]";
+}
+#else  // COSPEED_INSTRUMENTATION
 namespace {
 
 // Compute the total size of a pack of std::strings
@@ -56,4 +65,5 @@ std::string BenchmarkName::str() const {
   return join('/', function_name, args, min_time, min_warmup_time, iterations,
               repetitions, time_type, threads);
 }
+#endif
 }  // namespace benchmark
