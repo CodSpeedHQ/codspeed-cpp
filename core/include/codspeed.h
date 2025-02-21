@@ -6,8 +6,11 @@
 
 class CodSpeed {
 public:
-  // Constructor
-  CodSpeed();
+  // Public static method to access the single instance
+  static CodSpeed *getInstance() {
+    static CodSpeed instance;
+    return &instance;
+  }
 
   // Member functions
   void push_group(const std::string &group);
@@ -16,6 +19,8 @@ public:
   void end_benchmark();
 
 private:
+  // Private constructor to prevent direct instantiation
+  CodSpeed();
   std::vector<std::string> benchmarked;
   std::string current_benchmark;
   std::vector<std::string> group_stack;
