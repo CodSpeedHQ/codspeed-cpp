@@ -382,9 +382,16 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
   // Note the file_reporter can be null.
   BM_CHECK(display_reporter != nullptr);
 
-  hello_codspeed();
-
+#ifdef CODSPEED_ENABLED
+  auto& Err = display_reporter->GetErrorStream();
   // Determine the width of the name field using a minimum width of 10.
+#ifdef CODSPEED_INSTRUMENTATION
+  Err << "Codspeed mode: instrumentation" << "\n";
+#elif defined(CODSPEED_WALLTIME)
+  Err << "Codspeed mode: walltime" << "\n";
+#endif
+#endif  // CODSPEED_ENABLED
+
   bool might_have_aggregates = FLAGS_benchmark_repetitions > 1;
   size_t name_field_width = 10;
   size_t stat_field_width = 0;

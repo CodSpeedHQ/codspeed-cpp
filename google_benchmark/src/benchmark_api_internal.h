@@ -9,6 +9,9 @@
 #include <vector>
 
 #include "benchmark/benchmark.h"
+#ifdef CODSPEED_INSTRUMENTATION
+#include "codspeed.h"
+#endif
 #include "commandlineflags.h"
 
 namespace benchmark {
@@ -34,7 +37,13 @@ class BenchmarkInstance {
   BigO complexity() const { return complexity_; }
   BigOFunc* complexity_lambda() const { return complexity_lambda_; }
   const std::vector<Statistics>& statistics() const { return statistics_; }
-  int repetitions() const { return repetitions_; }
+  int repetitions() const {
+#ifdef CODSPEED_INSTRUMENTATION
+    return 1;
+#else
+    return repetitions_;
+#endif
+  }
   double min_time() const { return min_time_; }
   double min_warmup_time() const { return min_warmup_time_; }
   IterationCount iterations() const { return iterations_; }
@@ -46,6 +55,14 @@ class BenchmarkInstance {
             internal::ThreadManager* manager,
             internal::PerfCountersMeasurement* perf_counters_measurement,
             ProfilerManager* profiler_manager) const;
+
+#ifdef CODSPEED_INSTRUMENTATION
+  State RunInstrumented(
+      CodSpeed* codspeed, internal::ThreadTimer* timer,
+      internal::ThreadManager* manager,
+      internal::PerfCountersMeasurement* perf_counters_measurement,
+      ProfilerManager* profiler_manager) const;
+#endif
 
  private:
   BenchmarkName name_;
