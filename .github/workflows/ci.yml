@@ -35,8 +35,8 @@ jobs:
         run: examples/google_benchmark/build-instrumentation/benchmark_example
         token: ${{ secrets.CODSPEED_TOKEN }}
 
-  build-walltime:
-    runs-on: ubuntu-latest
+  walltime:
+    runs-on: codspeed-macro
 
     steps:
     - name: Checkout code
@@ -56,6 +56,13 @@ jobs:
         cd examples/google_benchmark/build-walltime
         cmake -DCODSPEED_MODE=walltime ..
         make -j
+
+    - name: Run the benchmarks
+      uses: CodSpeedHQ/action@main
+      with:
+        run: examples/google_benchmark/build-walltime/benchmark_example
+        token: ${{ secrets.CODSPEED_TOKEN }}
+
 
   build-no-codspeed:
     runs-on: ubuntu-latest
