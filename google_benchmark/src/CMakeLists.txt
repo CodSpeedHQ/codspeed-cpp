@@ -82,9 +82,8 @@ set_target_properties(benchmark_main PROPERTIES
 )
 target_link_libraries(benchmark_main PUBLIC benchmark::benchmark)
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/../core codspeed)
-
-target_link_libraries(benchmark PRIVATE codspeed)
+# TODO: Find a way to not expose codspeed headers to downstream users
+target_link_libraries(benchmark PUBLIC codspeed)
 
 set(generated_dir "${PROJECT_BINARY_DIR}")
 

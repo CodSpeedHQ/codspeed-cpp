@@ -97,6 +97,8 @@ option(BENCHMARK_ENABLE_ASSEMBLY_TESTS "Enable building and running the assembly
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# Codspeed specific configuration
+include(Codspeed)
 
 # Read the git tags to determine the project version
 include(GetGitVersion)

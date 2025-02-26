@@ -42,6 +42,7 @@
 #include <utility>
 
 #include "check.h"
+#include "codspeed.h"
 #include "colorprint.h"
 #include "commandlineflags.h"
 #include "complexity.h"
@@ -460,6 +461,18 @@ void BenchmarkRunner::RunProfilerManager(IterationCount profile_iterations) {
 }
 
 void BenchmarkRunner::DoOneRepetition() {
+#ifdef CODSPEED_INSTRUMENTATION
+  std::unique_ptr<internal::ThreadManager> manager;
+  manager.reset(new internal::ThreadManager(b.threads()));
+  internal::ThreadTimer timer = internal::ThreadTimer::Create();
+  b.Setup();
+  State st = b.RunInstrumented(CodSpeed::getInstance(), &timer, manager.get(),
+                               nullptr, nullptr);
+  b.Teardown();
+
+  return;
+#endif
+
   assert(HasRepeatsRemaining() && "Already done all repetitions?");
 
   const bool is_the_first_repetition = num_repetitions_done == 0;

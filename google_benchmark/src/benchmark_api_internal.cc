@@ -2,7 +2,9 @@
 
 #include <cinttypes>
 
+#include "codspeed.h"
 #include "string_util.h"
+#include "thread_timer.h"
 
 namespace benchmark {
 namespace internal {
@@ -88,6 +90,28 @@ BenchmarkInstance::BenchmarkInstance(Benchmark* benchmark, int family_idx,
   setup_ = benchmark_.setup_;
   teardown_ = benchmark_.teardown_;
 }
+
+#ifdef CODSPEED_INSTRUMENTATION
+State BenchmarkInstance::RunInstrumented(
+    CodSpeed* codspeed, internal::ThreadTimer* timer,
+    internal::ThreadManager* manager,
+    internal::PerfCountersMeasurement* perf_counters_measurement,
+    ProfilerManager* profiler_manager) const {
+  State st(name_.function_name, 1, args_, 0, 1, timer, manager,
+           perf_counters_measurement, profiler_manager);
+  // Do one repetition to avoid flakiness due to inconcistencies in CPU cache
+  // from execution order
+
+  internal::ThreadTimer warmup_timer = internal::ThreadTimer::Create();
+  State warmup_state(name_.function_name, 1, args_, 0, 1, &warmup_timer,
+                     manager, perf_counters_measurement, profiler_manager);
+  benchmark_.Run(warmup_state);
+  codspeed->start_benchmark(name().str());
+  benchmark_.Run(st);
+  codspeed->end_benchmark();
+  return st;
+}
+#endif
 
 State BenchmarkInstance::Run(
     IterationCount iters, int thread_id, internal::ThreadTimer* timer,
