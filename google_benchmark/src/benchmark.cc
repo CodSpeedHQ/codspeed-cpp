@@ -349,6 +349,51 @@ void FlushStreams(BenchmarkReporter* reporter) {
   std::flush(reporter->GetErrorStream());
 }
 
+#ifdef CODSPEED_WALLTIME
+// We use real time by default, but we could offer CPU time usage as a build
+// option, open an issue if you need it.
+RawWalltimeBenchmark generate_raw_walltime_data(const RunResults& run_results) {
+  RawWalltimeBenchmark walltime_data;
+
+  for (const auto& run : run_results.non_aggregates) {
+    walltime_data.uri = run.benchmark_name();
+    size_t pos = walltime_data.uri.rfind("::");
+
+    if (pos != std::string::npos) {
+      walltime_data.name = walltime_data.uri.substr(pos + 2);
+    } else {
+      // Fallback to a placeholder uri, but something is wrong
+      walltime_data.name = walltime_data.uri;
+      walltime_data.uri = "unknown_file::" + walltime_data.uri;
+    }
+
+    walltime_data.iter_per_round = run.iterations;
+    walltime_data.round_times_ns.push_back(run.GetAdjustedRealTime());
+  }
+
+  if (run_results.aggregates_only.empty()) {
+    // If run has no aggreagates, it means that only one round was performed.
+    // Use this time as a mean, median, and set stdev to 0.
+    double only_round_time_ns = walltime_data.round_times_ns[0];
+    walltime_data.mean_ns = only_round_time_ns;
+    walltime_data.median_ns = only_round_time_ns;
+    walltime_data.stdev_ns = 0;
+  } else {
+    for (const auto& aggregate_run : run_results.aggregates_only) {
+      if (aggregate_run.aggregate_name == "mean") {
+        walltime_data.mean_ns = aggregate_run.GetAdjustedRealTime();
+      } else if (aggregate_run.aggregate_name == "median") {
+        walltime_data.median_ns = aggregate_run.GetAdjustedRealTime();
+      } else if (aggregate_run.aggregate_name == "stddev") {
+        walltime_data.stdev_ns = aggregate_run.GetAdjustedRealTime();
+      }
+    }
+  }
+
+  return walltime_data;
+}
+#endif
+
 // Reports in both display and file reporters.
 void Report(BenchmarkReporter* display_reporter,
             BenchmarkReporter* file_reporter, const RunResults& run_results) {
@@ -481,6 +526,9 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
       std::shuffle(repetition_indices.begin(), repetition_indices.end(), g);
     }
 
+#ifdef CODSPEED_WALLTIME
+    std::vector<RawWalltimeBenchmark> codspeed_walltime_data;
+#endif
     for (size_t repetition_index : repetition_indices) {
       internal::BenchmarkRunner& runner = runners[repetition_index];
       runner.DoOneRepetition();
@@ -511,8 +559,15 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
         }
       }
 
+#ifdef CODSPEED_WALLTIME
+      codspeed_walltime_data.push_back(generate_raw_walltime_data(run_results));
+#endif
+
       Report(display_reporter, file_reporter, run_results);
     }
+#ifdef CODSPEED_WALLTIME
+    generate_codspeed_walltime_report(codspeed_walltime_data);
+#endif
   }
   display_reporter->Finalize();
   if (file_reporter != nullptr) {

@@ -27,4 +27,18 @@ private:
   bool is_instrumented;
 };
 
+// Times are per iteration
+struct RawWalltimeBenchmark {
+  std::string name;
+  std::string uri;
+  long iter_per_round;
+  double mean_ns;
+  double median_ns;
+  double stdev_ns;
+  std::vector<double> round_times_ns;
+};
+
+void generate_codspeed_walltime_report(
+    const std::vector<RawWalltimeBenchmark> &walltime_data_list);
+
 #endif // CODSPEED_H

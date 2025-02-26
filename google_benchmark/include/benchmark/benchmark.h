@@ -1438,7 +1438,7 @@ class Fixture : public internal::Benchmark {
   static ::benchmark::internal::Benchmark const* const BENCHMARK_PRIVATE_NAME( \
       n) [[maybe_unused]]
 
-#ifdef CODSPEED_INSTRUMENTATION
+#ifdef CODSPEED_ENABLED
 #include <filesystem>
 #define BENCHMARK(...)                                                   \
   BENCHMARK_PRIVATE_DECLARE(_benchmark_) =                               \

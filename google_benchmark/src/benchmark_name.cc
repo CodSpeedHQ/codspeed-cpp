@@ -16,7 +16,7 @@
 
 namespace benchmark {
 
-#ifdef CODSPEED_INSTRUMENTATION
+#ifdef CODSPEED_ENABLED
 BENCHMARK_EXPORT std::string BenchmarkName::str() const {
   if (args.empty()) {
     return function_name;
