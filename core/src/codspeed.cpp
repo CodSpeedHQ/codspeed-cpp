@@ -38,7 +38,16 @@ void CodSpeed::pop_group() {
 }
 
 void CodSpeed::start_benchmark(const std::string &name) {
-  current_benchmark = name;
+  std::string uri = name;
+
+  // Sanity check URI and add a placeholder if format is wrong
+  if (name.find("::") == std::string::npos) {
+    std::string uri = "unknown_file::" + name;
+    std::cout << "WARNING: Benchmark name does not contain '::'. Using URI: "
+              << uri << std::endl;
+  }
+
+  current_benchmark = uri;
   measurement_start();
 }
 

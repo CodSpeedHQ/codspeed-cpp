@@ -24,6 +24,7 @@ target_compile_definitions(
 )
 
 if(DEFINED CODSPEED_MODE)
+    target_compile_definitions(codspeed INTERFACE -DCODSPEED_ENABLED)
     # Define a preprocessor macro based on the build mode
     if(CODSPEED_MODE STREQUAL "instrumentation")
         target_compile_definitions(
