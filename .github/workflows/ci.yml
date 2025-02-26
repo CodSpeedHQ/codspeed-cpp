@@ -56,3 +56,25 @@ jobs:
         cd examples/google_benchmark/build-walltime
         cmake -DCODSPEED_MODE=walltime ..
         make -j
+
+  build-no-codspeed:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Cache build
+      uses: actions/cache@v3
+      with:
+        path: examples/google_benchmark/build-no-codspeed
+        key: ${{ runner.os }}-build-no-codspeed-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark/**') }}
+
+    - name: Create build directory
+      run: mkdir -p examples/google_benchmark/build-no-codspeed
+
+    - name: Build benchmark example without codspeed
+      run: |
+        cd examples/google_benchmark/build-no-codspeed
+        cmake  ..
+        make -j
