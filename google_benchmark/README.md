@@ -1,221 +1,102 @@
-# Benchmark
+<div align="center">
+<h1>codspeed-google-benchmark</h1>
 
-[![build-and-test](https://github.com/google/benchmark/workflows/build-and-test/badge.svg)](https://github.com/google/benchmark/actions?query=workflow%3Abuild-and-test)
-[![bazel](https://github.com/google/benchmark/actions/workflows/bazel.yml/badge.svg)](https://github.com/google/benchmark/actions/workflows/bazel.yml)
-[![pylint](https://github.com/google/benchmark/workflows/pylint/badge.svg)](https://github.com/google/benchmark/actions?query=workflow%3Apylint)
-[![test-bindings](https://github.com/google/benchmark/workflows/test-bindings/badge.svg)](https://github.com/google/benchmark/actions?query=workflow%3Atest-bindings)
-[![Coverage Status](https://coveralls.io/repos/google/benchmark/badge.svg)](https://coveralls.io/r/google/benchmark)
+[![CI](https://github.com/CodSpeedHQ/codspeed-cpp/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/CodSpeedHQ/codspeed-cpp/actions/workflows/ci.yml)
+[![Discord](https://img.shields.io/badge/chat%20on-discord-7289da.svg)](https://discord.com/invite/MxpaCfKSqF)
+[![CodSpeed Badge](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/CodSpeedHQ/codspeed-cpp)
 
-[![Discord](https://discordapp.com/api/guilds/1125694995928719494/widget.png?style=shield)](https://discord.gg/cz7UX7wKC2)
+Google benchmark compatibility layer for CodSpeed
 
-A library to benchmark code snippets, similar to unit tests. Example:
-
-```c++
-#include <benchmark/benchmark.h>
-
-static void BM_SomeFunction(benchmark::State& state) {
-  // Perform setup here
-  for (auto _ : state) {
-    // This code gets timed
-    SomeFunction();
-  }
-}
-// Register the function as a benchmark
-BENCHMARK(BM_SomeFunction);
-// Run the benchmark
-BENCHMARK_MAIN();
-```
-
-## Getting Started
-
-To get started, see [Requirements](#requirements) and
-[Installation](#installation). See [Usage](#usage) for a full example and the
-[User Guide](docs/user_guide.md) for a more comprehensive feature overview.
-
-It may also help to read the [Google Test documentation](https://github.com/google/googletest/blob/main/docs/primer.md)
-as some of the structural aspects of the APIs are similar.
-
-## Resources
-
-[Discussion group](https://groups.google.com/d/forum/benchmark-discuss)
-
-IRC channels:
-* [libera](https://libera.chat) #benchmark
-
-[Additional Tooling Documentation](docs/tools.md)
-
-[Assembly Testing Documentation](docs/AssemblyTests.md)
-
-[Building and installing Python bindings](docs/python_bindings.md)
-
-## Requirements
-
-The library can be used with C++03. However, it requires C++14 to build,
-including compiler and standard library support.
-
-_See [dependencies.md](docs/dependencies.md) for more details regarding supported
-compilers and standards._
-
-If you have need for a particular compiler to be supported, patches are very welcome.
-
-See [Platform-Specific Build Instructions](docs/platform_specific_build_instructions.md).
+</div>
 
 ## Installation
 
-This describes the installation process using cmake. As pre-requisites, you'll
-need git and cmake installed.
+The recommended way to use CodSpeed's `google_benchmark` is through `cmake`. Add
+the following to your `CMakeLists.txt`:
 
-_See [dependencies.md](docs/dependencies.md) for more details regarding supported
-versions of build tools._
+```cmake title="CMakeLists.txt"
+cmake_minimum_required(VERSION 3.12)
+include(FetchContent)
 
-```bash
-# Check out the library.
-$ git clone https://github.com/google/benchmark.git
-# Go to the library root directory
-$ cd benchmark
-# Make a build directory to place the build output.
-$ cmake -E make_directory "build"
-# Generate build system files with cmake, and download any dependencies.
-$ cmake -E chdir "build" cmake -DBENCHMARK_DOWNLOAD_DEPENDENCIES=on -DCMAKE_BUILD_TYPE=Release ../
-# or, starting with CMake 3.13, use a simpler form:
-# cmake -DBENCHMARK_DOWNLOAD_DEPENDENCIES=on -DCMAKE_BUILD_TYPE=Release -S . -B "build"
-# Build the library.
-$ cmake --build "build" --config Release
+project(my_codspeed_project VERSION 0.0.0 LANGUAGES CXX)
+
+set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON)
+
+FetchContent_Declare(
+    google_benchmark
+    GIT_REPOSITORY https://github.com/CodSpeedHQ/codspeed-cpp
+    GIT_TAG v1.0.0
+    SOURCE_SUBDIR
+    google_benchmark
+)
+
+FetchContent_MakeAvailable(google_benchmark)
+
+# Declare your benchmark executable and its sources here
+add_executable(my_benchmark_executable main.cpp)
+
+# Link your executable against the `benchmark::benchmark` library
+target_link_libraries(my_benchmark_example benchmark::benchmark)
 ```
-This builds the `benchmark` and `benchmark_main` libraries and tests.
-On a unix system, the build directory should now look something like this:
-
-```
-/benchmark
-  /build
-    /src
-      /libbenchmark.a
-      /libbenchmark_main.a
-    /test
-      ...
-```
-
-Next, you can run the tests to check the build.
-
-```bash
-$ cmake -E chdir "build" ctest --build-config Release
-```
-
-If you want to install the library globally, also run:
-
-```
-sudo cmake --build "build" --config Release --target install
-```
-
-Note that Google Benchmark requires Google Test to build and run the tests. This
-dependency can be provided two ways:
-
-* Checkout the Google Test sources into `benchmark/googletest`.
-* Otherwise, if `-DBENCHMARK_DOWNLOAD_DEPENDENCIES=ON` is specified during
-  configuration as above, the library will automatically download and build
-  any required dependencies.
-
-If you do not wish to build and run the tests, add `-DBENCHMARK_ENABLE_GTEST_TESTS=OFF`
-to `CMAKE_ARGS`.
-
-### Debug vs Release
-
-By default, benchmark builds as a debug library. You will see a warning in the
-output when this is the case. To build it as a release library instead, add
-`-DCMAKE_BUILD_TYPE=Release` when generating the build system files, as shown
-above. The use of `--config Release` in build commands is needed to properly
-support multi-configuration tools (like Visual Studio for example) and can be
-skipped for other build systems (like Makefile).
-
-To enable link-time optimisation, also add `-DBENCHMARK_ENABLE_LTO=true` when
-generating the build system files.
-
-If you are using gcc, you might need to set `GCC_AR` and `GCC_RANLIB` cmake
-cache variables, if autodetection fails.
-
-If you are using clang, you may need to set `LLVMAR_EXECUTABLE`,
-`LLVMNM_EXECUTABLE` and `LLVMRANLIB_EXECUTABLE` cmake cache variables.
-
-To enable sanitizer checks (eg., `asan` and `tsan`), add:
-```
- -DCMAKE_C_FLAGS="-g -O2 -fno-omit-frame-pointer -fsanitize=address -fsanitize=thread -fno-sanitize-recover=all"
- -DCMAKE_CXX_FLAGS="-g -O2 -fno-omit-frame-pointer -fsanitize=address -fsanitize=thread -fno-sanitize-recover=all "  
-```
-
-### Stable and Experimental Library Versions
-
-The main branch contains the latest stable version of the benchmarking library;
-the API of which can be considered largely stable, with source breaking changes
-being made only upon the release of a new major version.
-
-Newer, experimental, features are implemented and tested on the
-[`v2` branch](https://github.com/google/benchmark/tree/v2). Users who wish
-to use, test, and provide feedback on the new features are encouraged to try
-this branch. However, this branch provides no stability guarantees and reserves
-the right to change and break the API at any time.
 
 ## Usage
 
-### Basic usage
+### Creating benchmark
 
-Define a function that executes the code to measure, register it as a benchmark
-function using the `BENCHMARK` macro, and ensure an appropriate `main` function
-is available:
+Here is an example benchmark, follow the [google benchmark documentation](https://github.com/google/benchmark/blob/main/docs/user_guide.md) for more advanced usage.
 
-```c++
-#include <benchmark/benchmark.h>
-
-static void BM_StringCreation(benchmark::State& state) {
-  for (auto _ : state)
-    std::string empty_string;
-}
-// Register the function as a benchmark
-BENCHMARK(BM_StringCreation);
-
-// Define another benchmark
-static void BM_StringCopy(benchmark::State& state) {
+```cpp title="main.cpp"
+// Define the function under test
+static void BM_StringCopy(benchmark::State &state) {
   std::string x = "hello";
-  for (auto _ : state)
+
+  // Google benchmark relies on state.begin() and state.end() to run the benchmark and count iterations
+  for (auto _ : state) {
     std::string copy(x);
+  }
 }
+// Register the benchmarked to be called by the executable
 BENCHMARK(BM_StringCopy);
 
-BENCHMARK_MAIN();
+static void BM_memcpy(benchmark::State &state) {
+  char *src = new char[state.range(0)];
+  char *dst = new char[state.range(0)];
+  memset(src, 'x', state.range(0));
+  for (auto _ : state)
+    memcpy(dst, src, state.range(0));
+  delete[] src;
+  delete[] dst;
+}
+
+BENCHMARK(BM_memcpy)->Range(8, 8 << 10);
 ```
 
-To run the benchmark, compile and link against the `benchmark` library
-(libbenchmark.a/.so). If you followed the build steps above, this library will 
-be under the build directory you created.
+### Compiling and running benchmarks
 
-```bash
-# Example on linux after running the build steps above. Assumes the
-# `benchmark` and `build` directories are under the current directory.
-$ g++ mybenchmark.cc -std=c++11 -isystem benchmark/include \
-  -Lbenchmark/build/src -lbenchmark -lpthread -o mybenchmark
+To build and run the benchmark executable
+
+```
+$ mkdir build
+$ cd build
+$ cmake -DCODSPEED_MODE=instrumentation ..
+    ...
+    -- Configuring done (8.9s)
+    -- Generating done (0.1s)
+    -- Build files have been written to: /home/user/my-project/build
+$ make -j
+    ...
+    [ 98%] Built target reporter_output_test
+    [100%] Linking CXX executable benchmark_gtest
+    [100%] Built target benchmark_gtest
+$ ./my-bench
+    NOTICE: codspeed is enabled, but no performance measurement will be made since it's running in an unknown environment.
+    Checked: main.cpp::BM_rand_vector
+    Checked: main.cpp::BM_StringCopy
+    Checked: main.cpp::BM_memcpy[8]
+    Checked: main.cpp::BM_memcpy[64]
+    Checked: main.cpp::BM_memcpy[512]
+    Checked: main.cpp::BM_memcpy[4096]
+    Checked: main.cpp::BM_memcpy[8192]
 ```
 
-Alternatively, link against the `benchmark_main` library and remove
-`BENCHMARK_MAIN();` above to get the same behavior.
-
-The compiled executable will run all benchmarks by default. Pass the `--help`
-flag for option information or see the [User Guide](docs/user_guide.md).
-
-### Usage with CMake
-
-If using CMake, it is recommended to link against the project-provided
-`benchmark::benchmark` and `benchmark::benchmark_main` targets using
-`target_link_libraries`.
-It is possible to use ```find_package``` to import an installed version of the
-library.
-```cmake
-find_package(benchmark REQUIRED)
-```
-Alternatively, ```add_subdirectory``` will incorporate the library directly in
-to one's CMake project.
-```cmake
-add_subdirectory(benchmark)
-```
-Either way, link to the library as follows.
-```cmake
-target_link_libraries(MyTarget benchmark::benchmark)
-```
+For more information, please checkout the [codspeed documentation](https://docs.codspeed.io/benchmarks/cpp)
