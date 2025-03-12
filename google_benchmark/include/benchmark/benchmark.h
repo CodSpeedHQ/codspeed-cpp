@@ -1439,9 +1439,16 @@ class Fixture : public internal::Benchmark {
       n) [[maybe_unused]]
 
 #ifdef CODSPEED_ENABLED
+#include <codspeed.h>
+
 #include <filesystem>
+
 #define CUR_FILE \
   std::filesystem::relative(__FILE__, CODSPEED_GIT_ROOT_DIR).string() + "::"
+#define NAMESPACE \
+  (([]() { return extract_lambda_namespace(__PRETTY_FUNCTION__); })())
+
+#define FILE_AND_NAMESPACE CUR_FILE + NAMESPACE
 
 // Transforms `BM_Foo<int, double>` into `BM_Foo[int, double]`.
 #define TYPE_START "["
@@ -1454,7 +1461,7 @@ class Fixture : public internal::Benchmark {
 // Extra space after the comma for readability
 #define COMMA ", "
 #else
-#define CUR_FILE std::string()
+#define FILE_AND_NAMESPACE std::string()
 
 #define TYPE_START "<"
 #define TYPE_END ">"
@@ -1469,7 +1476,7 @@ class Fixture : public internal::Benchmark {
   BENCHMARK_PRIVATE_DECLARE(_benchmark_) =                            \
       (::benchmark::internal::RegisterBenchmarkInternal(              \
           std::make_unique<::benchmark::internal::FunctionBenchmark>( \
-              CUR_FILE + #__VA_ARGS__, __VA_ARGS__)))
+              FILE_AND_NAMESPACE + #__VA_ARGS__, __VA_ARGS__)))
 
 // Old-style macros
 #define BENCHMARK_WITH_ARG(n, a) BENCHMARK(n)->Arg((a))
@@ -1490,11 +1497,11 @@ class Fixture : public internal::Benchmark {
 //}
 // /* Registers a benchmark named "BM_takes_args/int_string_test` */
 // BENCHMARK_CAPTURE(BM_takes_args, int_string_test, 42, std::string("abc"));
-#define BENCHMARK_CAPTURE(func, test_case_name, ...)                  \
-  BENCHMARK_PRIVATE_DECLARE(_benchmark_) =                            \
-      (::benchmark::internal::RegisterBenchmarkInternal(              \
-          std::make_unique<::benchmark::internal::FunctionBenchmark>( \
-              CUR_FILE + #func NAME_START #test_case_name NAME_END,   \
+#define BENCHMARK_CAPTURE(func, test_case_name, ...)                          \
+  BENCHMARK_PRIVATE_DECLARE(_benchmark_) =                                    \
+      (::benchmark::internal::RegisterBenchmarkInternal(                      \
+          std::make_unique<::benchmark::internal::FunctionBenchmark>(         \
+              FILE_AND_NAMESPACE + #func NAME_START #test_case_name NAME_END, \
               [](::benchmark::State& st) { func(st, __VA_ARGS__); })))
 
 // This will register a benchmark for a templatized function.  For example:
@@ -1509,19 +1516,20 @@ class Fixture : public internal::Benchmark {
   BENCHMARK_PRIVATE_DECLARE(n) =                                      \
       (::benchmark::internal::RegisterBenchmarkInternal(              \
           std::make_unique<::benchmark::internal::FunctionBenchmark>( \
-              CUR_FILE + #n TYPE_START #a TYPE_END, n<a>)))
+              FILE_AND_NAMESPACE + #n TYPE_START #a TYPE_END, n<a>)))
 
-#define BENCHMARK_TEMPLATE2(n, a, b)                                  \
-  BENCHMARK_PRIVATE_DECLARE(n) =                                      \
-      (::benchmark::internal::RegisterBenchmarkInternal(              \
-          std::make_unique<::benchmark::internal::FunctionBenchmark>( \
-              CUR_FILE + #n TYPE_START #a COMMA #b TYPE_END, n<a, b>)))
+#define BENCHMARK_TEMPLATE2(n, a, b)                                   \
+  BENCHMARK_PRIVATE_DECLARE(n) =                                       \
+      (::benchmark::internal::RegisterBenchmarkInternal(               \
+          std::make_unique<::benchmark::internal::FunctionBenchmark>(  \
+              FILE_AND_NAMESPACE + #n TYPE_START #a COMMA #b TYPE_END, \
+              n<a, b>)))
 
-#define BENCHMARK_TEMPLATE(n, ...)                                    \
-  BENCHMARK_PRIVATE_DECLARE(n) =                                      \
-      (::benchmark::internal::RegisterBenchmarkInternal(              \
-          std::make_unique<::benchmark::internal::FunctionBenchmark>( \
-              CUR_FILE + #n TYPE_START #__VA_ARGS__ TYPE_END,         \
+#define BENCHMARK_TEMPLATE(n, ...)                                      \
+  BENCHMARK_PRIVATE_DECLARE(n) =                                        \
+      (::benchmark::internal::RegisterBenchmarkInternal(                \
+          std::make_unique<::benchmark::internal::FunctionBenchmark>(   \
+              FILE_AND_NAMESPACE + #n TYPE_START #__VA_ARGS__ TYPE_END, \
               n<__VA_ARGS__>)))
 
 // This will register a benchmark for a templatized function,
@@ -1544,7 +1552,8 @@ class Fixture : public internal::Benchmark {
   BENCHMARK_PRIVATE_DECLARE(_benchmark_) =                                \
       (::benchmark::internal::RegisterBenchmarkInternal(                  \
           std::make_unique<::benchmark::internal::FunctionBenchmark>(     \
-              CUR_FILE + #func_name NAME_START #test_case_name NAME_END,  \
+              FILE_AND_NAMESPACE +                                        \
+                  #func_name NAME_START #test_case_name NAME_END,         \
               [](::benchmark::State& st) { func(st, __VA_ARGS__); })))
 
 #define BENCHMARK_TEMPLATE1_CAPTURE(func, a, test_case_name, ...) \
@@ -1555,11 +1564,12 @@ class Fixture : public internal::Benchmark {
 #endif
 
 #ifdef CODSPEED_ENABLED
-#define BENCHMARK_TEMPLATE2_CAPTURE(func, a, b, test_case_name, ...)      \
-  BENCHMARK_PRIVATE_DECLARE(func) =                                       \
-      (::benchmark::internal::RegisterBenchmarkInternal(                  \
-          std::make_unique<::benchmark::internal::FunctionBenchmark>(     \
-              CUR_FILE + #func "[" #test_case_name COMMA #a COMMA #b "]", \
+#define BENCHMARK_TEMPLATE2_CAPTURE(func, a, b, test_case_name, ...)           \
+  BENCHMARK_PRIVATE_DECLARE(func) =                                            \
+      (::benchmark::internal::RegisterBenchmarkInternal(                       \
+          std::make_unique<::benchmark::internal::FunctionBenchmark>(          \
+              FILE_AND_NAMESPACE + #func "[" #test_case_name COMMA #a COMMA #b \
+                                         "]",                                  \
               [](::benchmark::State& st) { func<a, b>(st, __VA_ARGS__); })))
 #else
 #define BENCHMARK_TEMPLATE2_CAPTURE(func, a, b, test_case_name, ...)  \

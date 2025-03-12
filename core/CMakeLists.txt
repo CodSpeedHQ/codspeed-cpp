@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(include)
 
 # Add the library
-add_library(codspeed src/codspeed.cpp src/walltime.cpp)
+add_library(codspeed src/codspeed.cpp src/walltime.cpp src/uri.cpp)
 
 # Version
 add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
