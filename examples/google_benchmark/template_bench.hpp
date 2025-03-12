@@ -4,6 +4,7 @@
 #include <cstring>
 #include <string>
 
+namespace test {
 template <class T> void BM_Template(benchmark::State &state) {
   std::vector<T> v;
   for (auto _ : state) {
@@ -12,6 +13,7 @@ template <class T> void BM_Template(benchmark::State &state) {
 }
 BENCHMARK_TEMPLATE(BM_Template, int);
 BENCHMARK_TEMPLATE(BM_Template, std::string);
+}
 
 //
 //
