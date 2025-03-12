@@ -1537,8 +1537,18 @@ class Fixture : public internal::Benchmark {
 // BENCHMARK_TEMPLATE1_CAPTURE(BM_takes_args, void, int_string_test, 42,
 //                             std::string("abc"));
 #ifdef CODSPEED_ENABLED
+
+// BM_Template1_Capture<void>[int_string_test] will be turned into
+// BM_Template1_Capture[int_string_test]
+#define BENCHMARK_CAPTURE_WITH_NAME(func, func_name, test_case_name, ...) \
+  BENCHMARK_PRIVATE_DECLARE(_benchmark_) =                                \
+      (::benchmark::internal::RegisterBenchmarkInternal(                  \
+          std::make_unique<::benchmark::internal::FunctionBenchmark>(     \
+              CUR_FILE + #func_name NAME_START #test_case_name NAME_END,  \
+              [](::benchmark::State& st) { func(st, __VA_ARGS__); })))
+
 #define BENCHMARK_TEMPLATE1_CAPTURE(func, a, test_case_name, ...) \
-  BENCHMARK_CAPTURE(func, test_case_name, __VA_ARGS__)
+  BENCHMARK_CAPTURE_WITH_NAME(func<a>, func, test_case_name, __VA_ARGS__)
 #else
 #define BENCHMARK_TEMPLATE1_CAPTURE(func, a, test_case_name, ...) \
   BENCHMARK_CAPTURE(func<a>, test_case_name, __VA_ARGS__)
