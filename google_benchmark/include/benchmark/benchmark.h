@@ -1442,14 +1442,27 @@ class Fixture : public internal::Benchmark {
 #include <filesystem>
 #define CUR_FILE \
   std::filesystem::relative(__FILE__, CODSPEED_GIT_ROOT_DIR).string() + "::"
+
+// Transforms `BM_Foo<int, double>` into `BM_Foo[int, double]`.
 #define TYPE_START "["
 #define TYPE_END "]"
-#define FUNC_TEST_SEP "::"
+
+// Transforms `BM_Foo/int_arg` into `BM_Foo[int_arg]`.
+#define NAME_START "["
+#define NAME_END "]"
+
+// Extra space after the comma for readability
+#define COMMA ", "
 #else
 #define CUR_FILE std::string()
+
 #define TYPE_START "<"
 #define TYPE_END ">"
-#define FUNC_TEST_SEP "/"
+
+#define NAME_START "/"
+#define NAME_END ""
+
+#define COMMA ","
 #endif
 
 #define BENCHMARK(...)                                                \
@@ -1481,7 +1494,7 @@ class Fixture : public internal::Benchmark {
   BENCHMARK_PRIVATE_DECLARE(_benchmark_) =                            \
       (::benchmark::internal::RegisterBenchmarkInternal(              \
           std::make_unique<::benchmark::internal::FunctionBenchmark>( \
-              CUR_FILE + #func FUNC_TEST_SEP #test_case_name,         \
+              CUR_FILE + #func NAME_START #test_case_name NAME_END,   \
               [](::benchmark::State& st) { func(st, __VA_ARGS__); })))
 
 // This will register a benchmark for a templatized function.  For example:
@@ -1502,7 +1515,7 @@ class Fixture : public internal::Benchmark {
   BENCHMARK_PRIVATE_DECLARE(n) =                                      \
       (::benchmark::internal::RegisterBenchmarkInternal(              \
           std::make_unique<::benchmark::internal::FunctionBenchmark>( \
-              CUR_FILE + #n TYPE_START #a "," #b TYPE_END, n<a, b>)))
+              CUR_FILE + #n TYPE_START #a COMMA #b TYPE_END, n<a, b>)))
 
 #define BENCHMARK_TEMPLATE(n, ...)                                    \
   BENCHMARK_PRIVATE_DECLARE(n) =                                      \
@@ -1531,13 +1544,22 @@ class Fixture : public internal::Benchmark {
   BENCHMARK_CAPTURE(func<a>, test_case_name, __VA_ARGS__)
 #endif
 
+#ifdef CODSPEED_ENABLED
+#define BENCHMARK_TEMPLATE2_CAPTURE(func, a, b, test_case_name, ...)      \
+  BENCHMARK_PRIVATE_DECLARE(func) =                                       \
+      (::benchmark::internal::RegisterBenchmarkInternal(                  \
+          std::make_unique<::benchmark::internal::FunctionBenchmark>(     \
+              CUR_FILE + #func "[" #test_case_name COMMA #a COMMA #b "]", \
+              [](::benchmark::State& st) { func<a, b>(st, __VA_ARGS__); })))
+#else
 #define BENCHMARK_TEMPLATE2_CAPTURE(func, a, b, test_case_name, ...)  \
   BENCHMARK_PRIVATE_DECLARE(func) =                                   \
       (::benchmark::internal::RegisterBenchmarkInternal(              \
           std::make_unique<::benchmark::internal::FunctionBenchmark>( \
-              CUR_FILE + #func TYPE_START #a                          \
-                  "," #b TYPE_END FUNC_TEST_SEP #test_case_name,      \
+              #func "<" #a "," #b ">"                                 \
+                    "/" #test_case_name,                              \
               [](::benchmark::State& st) { func<a, b>(st, __VA_ARGS__); })))
+#endif
 
 #define BENCHMARK_PRIVATE_DECLARE_F(BaseClass, Method)        \
   class BaseClass##_##Method##_Benchmark : public BaseClass { \
@@ -1688,7 +1710,6 @@ struct BENCHMARK_EXPORT SystemInfo {
 // which allows individual fields to be modified or cleared before
 // building the final name using 'str()'.
 struct BENCHMARK_EXPORT BenchmarkName {
-  std::string path;
   std::string function_name;
   std::string args;
   std::string min_time;
