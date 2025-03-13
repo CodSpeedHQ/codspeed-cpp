@@ -357,6 +357,8 @@ RawWalltimeBenchmark generate_raw_walltime_data(const RunResults& run_results) {
 
   for (const auto& run : run_results.non_aggregates) {
     walltime_data.uri = run.benchmark_name();
+    walltime_data.uri = sanitize_bench_args(walltime_data.uri);
+
     size_t pos = walltime_data.uri.rfind("::");
 
     if (pos != std::string::npos) {

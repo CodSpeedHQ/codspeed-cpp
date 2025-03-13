@@ -4,6 +4,35 @@
 #include <string>
 #include <vector>
 
+// Remove any `::` between brackets at the end to not mess with the URI
+// parsing
+// FIXME: Remove this bandaid when we migrate to structured benchmark metadata
+std::string sanitize_bench_args(std::string &text) {
+  std::string search = "::";
+  std::string replace = "\\:\\:";
+
+  if (text.back() == ']') {
+    size_t pos_open = text.rfind('[');
+    if (pos_open != std::string::npos) {
+      // Extract the substring between '[' and ']'
+      size_t pos_close = text.size() - 1;
+      std::string substring =
+          text.substr(pos_open + 1, pos_close - pos_open - 1);
+
+      // Perform the search and replace within the substring
+      size_t pos = substring.find(search);
+      while (pos != std::string::npos) {
+        substring.replace(pos, search.length(), replace);
+        pos = substring.find(search, pos + replace.length());
+      }
+
+      // Replace the original substring with the modified one
+      text.replace(pos_open + 1, pos_close - pos_open - 1, substring);
+    }
+  }
+  return text;
+}
+
 std::string join(const std::vector<std::string> &elements,
                  const std::string &delimiter) {
   std::string result;
@@ -39,6 +68,8 @@ void CodSpeed::pop_group() {
 
 void CodSpeed::start_benchmark(const std::string &name) {
   std::string uri = name;
+
+  uri = sanitize_bench_args(uri);
 
   // Sanity check URI and add a placeholder if format is wrong
   if (name.find("::") == std::string::npos) {

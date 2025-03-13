@@ -87,6 +87,18 @@ void compute_iqr_and_outliers(const std::vector<double> &times_ns, double mean,
                     });
 }
 
+std::string escapeBackslashes(const std::string &input) {
+  std::string output;
+  for (char c : input) {
+    if (c == '\\') {
+      output += "\\\\";
+    } else {
+      output += c;
+    }
+  }
+  return output;
+}
+
 void write_codspeed_benchmarks_to_json(
     const std::vector<CodspeedWalltimeBenchmark> &benchmarks) {
   std::ostringstream oss;
@@ -113,8 +125,8 @@ void write_codspeed_benchmarks_to_json(
     const auto &metadata = benchmark.metadata;
 
     oss << "    {\n";
-    oss << "      \"name\": \"" << metadata.name << "\",\n";
-    oss << "      \"uri\": \"" << metadata.uri << "\",\n";
+    oss << "      \"name\": \"" << escapeBackslashes(metadata.name) << "\",\n";
+    oss << "      \"uri\": \"" << escapeBackslashes(metadata.uri) << "\",\n";
     // TODO: Manage config fields from actual configuration
     oss << "      \"config\": {\n";
     oss << "        \"warmup_time_ns\": null,\n";
