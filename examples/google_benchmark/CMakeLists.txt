@@ -3,7 +3,7 @@ include(FetchContent)
 
 project(codspeed_picobench_compat VERSION 0.0.0 LANGUAGES CXX)
 
-set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON)
+option(BENCHMARK_ENABLE_GTEST_TESTS OFF)
 
 FetchContent_Declare(
     google_benchmark
