@@ -42,5 +42,6 @@ void generate_codspeed_walltime_report(
     const std::vector<RawWalltimeBenchmark> &walltime_data_list);
 
 std::string extract_lambda_namespace(const std::string &pretty_func);
+std::string sanitize_bench_args(std::string &text);
 
 #endif // CODSPEED_H
