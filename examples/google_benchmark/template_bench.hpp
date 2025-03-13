@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TEMPLATE_BENCH_HPP
+#define TEMPLATE_BENCH_HPP
 
 #include <benchmark/benchmark.h>
 #include <cstring>
@@ -13,7 +14,7 @@ template <class T> void BM_Template(benchmark::State &state) {
 }
 BENCHMARK_TEMPLATE(BM_Template, int);
 BENCHMARK_TEMPLATE(BM_Template, std::string);
-}
+} // namespace test
 
 //
 //
@@ -51,3 +52,5 @@ BENCHMARK_TEMPLATE1_CAPTURE(BM_Template1_Capture, void, int_string_test, 42,
                             std::string("abc"));
 BENCHMARK_TEMPLATE2_CAPTURE(BM_Template1_Capture, int, double, two_type_test,
                             42, std::string("abc"));
+
+#endif
