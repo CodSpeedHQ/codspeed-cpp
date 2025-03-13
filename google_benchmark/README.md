@@ -99,4 +99,8 @@ $ ./my-bench
     Checked: main.cpp::BM_memcpy[8192]
 ```
 
+### Not supported
+
+- Declaring benches within anonymous namespaces
+
 For more information, please checkout the [codspeed documentation](https://docs.codspeed.io/benchmarks/cpp)
