@@ -7,6 +7,39 @@ on:
   workflow_dispatch:
 
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps: 
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Cache build
+      uses: actions/cache@v3
+      with:
+        path: core/build-tests
+        key: ${{ runner.os }}-build-tests-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark/**') }}
+
+    - name: Create build directory
+      run: mkdir -p core/build-tests
+
+    - name: Build tests
+      run: |
+        cd core/build-tests
+        cmake .. -DENABLE_TESTS=ON
+        make -j
+
+    - name: Run tests
+      run: | 
+        cd core/build-tests
+        GTEST_OUTPUT=json:test-results/ ctest
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test_results
+        path: ${{runner.workspace}}/core/build-tests/test/test-results/**/*.json
+  
   instrumentation:
     runs-on: ubuntu-latest
 

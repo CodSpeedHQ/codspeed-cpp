@@ -28,3 +28,9 @@ target_include_directories(
     codspeed
     PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
+
+option(ENABLE_TESTS "Enable building the unit tests which depend on gtest" OFF)
+if(ENABLE_TESTS)
+    enable_testing() 
+    add_subdirectory(test)
+endif()
