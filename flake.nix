@@ -34,6 +34,14 @@
             '';
           };
 
+          clang = pkgs.mkShell {
+            buildInputs = with pkgs; [ clang ] ++ commonBuildInputs;
+            shellHook = ''
+              export CXX=clang++;
+              echo "Welcome to the C++ development environment with Clang!"
+            '';
+          };
+
           lsp = pkgs.mkShell {
             buildInputs =
               with pkgs;
