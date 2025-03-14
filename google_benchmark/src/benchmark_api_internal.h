@@ -39,6 +39,7 @@ class BenchmarkInstance {
   const std::vector<Statistics>& statistics() const { return statistics_; }
   int repetitions() const {
 #ifdef CODSPEED_INSTRUMENTATION
+    (void)repetitions_;
     return 1;
 #else
     return repetitions_;
