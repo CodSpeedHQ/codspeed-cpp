@@ -1447,6 +1447,7 @@ class Fixture : public internal::Benchmark {
   std::filesystem::relative(__FILE__, CODSPEED_GIT_ROOT_DIR).string() + "::"
 #define NAMESPACE \
   (([]() { return extract_lambda_namespace(__PRETTY_FUNCTION__); })())
+#define STATIC_NAMESPACE_STRING(name) static std::string name = NAMESPACE;
 
 #define FILE_AND_NAMESPACE CUR_FILE + NAMESPACE
 
@@ -1581,6 +1582,62 @@ class Fixture : public internal::Benchmark {
               [](::benchmark::State& st) { func<a, b>(st, __VA_ARGS__); })))
 #endif
 
+#ifdef CODSPEED_ENABLED
+
+#define BENCHMARK_PRIVATE_DECLARE_F(BaseClass, Method)        \
+    STATIC_NAMESPACE_STRING(ns_##BaseClass##_##Method);         \
+  class BaseClass##_##Method##_Benchmark : public BaseClass { \
+   public:                                                    \
+    BaseClass##_##Method##_Benchmark() {                      \
+      this->SetName(CUR_FILE + ns_##BaseClass##_##Method +    \
+                    #Method "[" #BaseClass "]");                  \
+    }                                                         \
+                                                              \
+   protected:                                                 \
+    void BenchmarkCase(::benchmark::State&) override;         \
+  };
+
+#define BENCHMARK_TEMPLATE1_PRIVATE_DECLARE_F(BaseClass, Method, a) \
+  STATIC_NAMESPACE_STRING(ns_##BaseClass##_##Method);               \
+  class BaseClass##_##Method##_Benchmark : public BaseClass<a> {    \
+   public:                                                          \
+    BaseClass##_##Method##_Benchmark() {                            \
+      this->SetName(CUR_FILE + ns_##BaseClass##_##Method +          \
+                    #Method "[" #BaseClass ", " #a "]");            \
+    }                                                               \
+                                                                    \
+   protected:                                                       \
+    void BenchmarkCase(::benchmark::State&) override;               \
+  };
+
+#define BENCHMARK_TEMPLATE2_PRIVATE_DECLARE_F(BaseClass, Method, a, b) \
+  STATIC_NAMESPACE_STRING(ns_##BaseClass##_##Method);                  \
+  class BaseClass##_##Method##_Benchmark : public BaseClass<a, b> {    \
+   public:                                                             \
+    BaseClass##_##Method##_Benchmark() {                               \
+      this->SetName(CUR_FILE + ns_##BaseClass##_##Method +             \
+                    #Method "[" #BaseClass ", " #a ", " #b "]");       \
+    }                                                                  \
+                                                                       \
+   protected:                                                          \
+    void BenchmarkCase(::benchmark::State&) override;                  \
+  };
+
+#define BENCHMARK_TEMPLATE_PRIVATE_DECLARE_F(BaseClass, Method, ...)       \
+  STATIC_NAMESPACE_STRING(ns_##BaseClass##_##Method);                      \
+  class BaseClass##_##Method##_Benchmark : public BaseClass<__VA_ARGS__> { \
+   public:                                                                 \
+    BaseClass##_##Method##_Benchmark() {                                   \
+      this->SetName(CUR_FILE + ns_##BaseClass##_##Method +                 \
+                    #Method "[" #BaseClass ", " #__VA_ARGS__ "]");         \
+    }                                                                      \
+                                                                           \
+   protected:                                                              \
+    void BenchmarkCase(::benchmark::State&) override;                      \
+  };
+
+#else // CODSPEED_ENABLED undefined:
+
 #define BENCHMARK_PRIVATE_DECLARE_F(BaseClass, Method)        \
   class BaseClass##_##Method##_Benchmark : public BaseClass { \
    public:                                                    \
@@ -1602,7 +1659,6 @@ class Fixture : public internal::Benchmark {
    protected:                                                       \
     void BenchmarkCase(::benchmark::State&) override;               \
   };
-
 #define BENCHMARK_TEMPLATE2_PRIVATE_DECLARE_F(BaseClass, Method, a, b) \
   class BaseClass##_##Method##_Benchmark : public BaseClass<a, b> {    \
    public:                                                             \
@@ -1624,6 +1680,7 @@ class Fixture : public internal::Benchmark {
    protected:                                                              \
     void BenchmarkCase(::benchmark::State&) override;                      \
   };
+#endif
 
 #define BENCHMARK_DEFINE_F(BaseClass, Method)    \
   BENCHMARK_PRIVATE_DECLARE_F(BaseClass, Method) \

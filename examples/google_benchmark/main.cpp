@@ -1,3 +1,4 @@
+#include "fixture_bench.hpp"
 #include "template_bench.hpp"
 #include <benchmark/benchmark.h>
 #include <cstring>
