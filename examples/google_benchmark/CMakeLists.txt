@@ -3,6 +3,8 @@ include(FetchContent)
 
 project(codspeed_picobench_compat VERSION 0.0.0 LANGUAGES CXX)
 
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
 option(BENCHMARK_ENABLE_GTEST_TESTS OFF)
 
 FetchContent_Declare(

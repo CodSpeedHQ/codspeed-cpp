@@ -23,7 +23,12 @@ target_compile_definitions(
     INTERFACE -DCODSPEED_GIT_ROOT_DIR="${GIT_ROOT_DIR}"
 )
 
-if(DEFINED CODSPEED_MODE)
+option(
+    CODSPEED_MODE
+    "Build mode for Codspeed: instrumentation, walltime or OFF (default)"
+)
+
+if(NOT CODSPEED_MODE STREQUAL "OFF")
     target_compile_definitions(codspeed INTERFACE -DCODSPEED_ENABLED)
     # Define a preprocessor macro based on the build mode
     if(CODSPEED_MODE STREQUAL "instrumentation")
@@ -41,4 +46,4 @@ if(DEFINED CODSPEED_MODE)
     endif()
 endif()
 
-message(STATUS "Build mode set to: ${CODSPEED_MODE}")
+message(STATUS "Codspeed mode: ${CODSPEED_MODE}")
