@@ -8,7 +8,11 @@
 #include <numeric>
 #include <sstream>
 #include <string>
-#include <thread>
+#ifdef _WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
 #include <vector>
 
 const double IQR_OUTLIER_FACTOR = 1.5;
@@ -105,7 +109,11 @@ void write_codspeed_benchmarks_to_json(
 
   std::string creator_name = "codspeed-cpp";
   std::string creator_version = CODSPEED_VERSION;
-  std::thread::id creator_pid = std::this_thread::get_id();
+#ifdef _WIN32
+  pid_t creator_pid = _getpid();
+#else
+  pid_t creator_pid = getpid();
+#endif
   std::string instrument_type = "walltime";
 
   oss << "{\n";
