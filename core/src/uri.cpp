@@ -1,10 +1,12 @@
 #include "codspeed.h"
-#include <string>
 #include <iostream>
+#include <string>
+
+namespace codspeed {
 
 // Example: auto outer::test12::(anonymous class)::operator()() const
 // Returns: outer::test12::
-std::string extract_namespace_clang(const std::string& pretty_func) {
+std::string extract_namespace_clang(const std::string &pretty_func) {
   std::size_t anon_class_pos = pretty_func.find("::(anonymous class)");
   std::size_t space_pos = pretty_func.find(' ');
 
@@ -18,31 +20,34 @@ std::string extract_namespace_clang(const std::string& pretty_func) {
 
 // Example: outer::test12::<lambda()>
 // Returns: outer::test12::
-std::string extract_namespace_gcc(const std::string& pretty_func) {
-    auto lambda_pos = pretty_func.find("::<lambda()>");
-    if (lambda_pos == std::string::npos) {
-        return {};
-    }
+std::string extract_namespace_gcc(const std::string &pretty_func) {
+  auto lambda_pos = pretty_func.find("::<lambda()>");
+  if (lambda_pos == std::string::npos) {
+    return {};
+  }
 
-    return pretty_func.substr(0, lambda_pos) + "::";
+  return pretty_func.substr(0, lambda_pos) + "::";
 }
 
-// Has to pass the pretty function from a lambda: 
+// Has to pass the pretty function from a lambda:
 //   (([]() { return __PRETTY_FUNCTION__; })())
 //
-// Returns: An empty string if the namespace could not be extracted, 
+// Returns: An empty string if the namespace could not be extracted,
 //         otherwise the namespace with a trailing "::"
-std::string extract_lambda_namespace(const std::string& pretty_func) {
+std::string extract_lambda_namespace(const std::string &pretty_func) {
   if (pretty_func.find("(anonymous namespace)") != std::string::npos) {
-    std::cerr << "[ERROR] Anonymous namespace not supported in " << pretty_func << std::endl;
+    std::cerr << "[ERROR] Anonymous namespace not supported in " << pretty_func
+              << std::endl;
     return {};
   }
 
 #ifdef __clang__
-    return extract_namespace_clang(pretty_func);
+  return extract_namespace_clang(pretty_func);
 #elif __GNUC__
-    return extract_namespace_gcc(pretty_func);
+  return extract_namespace_gcc(pretty_func);
 #else
 #error "Unsupported compiler"
 #endif
 }
+
+} // namespace codspeed

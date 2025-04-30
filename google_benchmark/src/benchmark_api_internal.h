@@ -59,7 +59,7 @@ class BenchmarkInstance {
 
 #ifdef CODSPEED_INSTRUMENTATION
   State RunInstrumented(
-      CodSpeed* codspeed, internal::ThreadTimer* timer,
+      codspeed::CodSpeed* codspeed, internal::ThreadTimer* timer,
       internal::ThreadManager* manager,
       internal::PerfCountersMeasurement* perf_counters_measurement,
       ProfilerManager* profiler_manager) const;

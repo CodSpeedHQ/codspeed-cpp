@@ -93,7 +93,7 @@ BenchmarkInstance::BenchmarkInstance(Benchmark* benchmark, int family_idx,
 
 #ifdef CODSPEED_INSTRUMENTATION
 State BenchmarkInstance::RunInstrumented(
-    CodSpeed* codspeed, internal::ThreadTimer* timer,
+    codspeed::CodSpeed* codspeed, internal::ThreadTimer* timer,
     internal::ThreadManager* manager,
     internal::PerfCountersMeasurement* perf_counters_measurement,
     ProfilerManager* profiler_manager) const {

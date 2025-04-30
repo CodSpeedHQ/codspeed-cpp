@@ -352,12 +352,13 @@ void FlushStreams(BenchmarkReporter* reporter) {
 #ifdef CODSPEED_WALLTIME
 // We use real time by default, but we could offer CPU time usage as a build
 // option, open an issue if you need it.
-RawWalltimeBenchmark generate_raw_walltime_data(const RunResults& run_results) {
-  RawWalltimeBenchmark walltime_data;
+codspeed::RawWalltimeBenchmark generate_raw_walltime_data(
+    const RunResults& run_results) {
+  codspeed::RawWalltimeBenchmark walltime_data;
 
   for (const auto& run : run_results.non_aggregates) {
     walltime_data.uri = run.benchmark_name();
-    walltime_data.uri = sanitize_bench_args(walltime_data.uri);
+    walltime_data.uri = codspeed::sanitize_bench_args(walltime_data.uri);
 
     size_t pos = walltime_data.uri.rfind("::");
 
@@ -529,7 +530,7 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
     }
 
 #ifdef CODSPEED_WALLTIME
-    std::vector<RawWalltimeBenchmark> codspeed_walltime_data;
+    std::vector<codspeed::RawWalltimeBenchmark> codspeed_walltime_data;
 #endif
     for (size_t repetition_index : repetition_indices) {
       internal::BenchmarkRunner& runner = runners[repetition_index];
@@ -568,7 +569,7 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
       Report(display_reporter, file_reporter, run_results);
     }
 #ifdef CODSPEED_WALLTIME
-    generate_codspeed_walltime_report(codspeed_walltime_data);
+    codspeed::generate_codspeed_walltime_report(codspeed_walltime_data);
 #endif
   }
   display_reporter->Finalize();

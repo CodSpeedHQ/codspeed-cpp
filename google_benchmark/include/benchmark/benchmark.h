@@ -1446,7 +1446,7 @@ class Fixture : public internal::Benchmark {
 #define CUR_FILE \
   std::filesystem::relative(__FILE__, CODSPEED_GIT_ROOT_DIR).string() + "::"
 #define NAMESPACE \
-  (([]() { return extract_lambda_namespace(__PRETTY_FUNCTION__); })())
+  (([]() { return codspeed::extract_lambda_namespace(__PRETTY_FUNCTION__); })())
 #define STATIC_NAMESPACE_STRING(name) static std::string name = NAMESPACE;
 
 #define FILE_AND_NAMESPACE CUR_FILE + NAMESPACE

@@ -15,6 +15,8 @@
 #endif
 #include <vector>
 
+namespace codspeed {
+
 const double IQR_OUTLIER_FACTOR = 1.5;
 const double STDEV_OUTLIER_FACTOR = 3.0;
 
@@ -243,3 +245,5 @@ void generate_codspeed_walltime_report(
 
   write_codspeed_benchmarks_to_json(codspeed_walltime_benchmarks);
 }
+
+} // namespace codspeed
