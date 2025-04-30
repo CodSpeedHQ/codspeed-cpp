@@ -77,7 +77,7 @@ cc_library(
         "_LARGEFILE_SOURCE",
     ],
     visibility = ["//visibility:public"],
-    deps = select({
+    deps = ["//core:codspeed"] + select({
         ":perfcounters": ["@libpfm"],
         "//conditions:default": [],
     }),

@@ -20,8 +20,11 @@
         # Common build inputs for both shells
         commonBuildInputs = with pkgs; [
           gcc
-          cmake
           pkg-config
+
+          # Build systems
+          cmake
+          bazelisk
         ];
 
       in

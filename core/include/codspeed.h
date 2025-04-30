@@ -46,6 +46,10 @@ void generate_codspeed_walltime_report(
 std::string extract_lambda_namespace(const std::string &pretty_func);
 std::string sanitize_bench_args(std::string &text);
 
+// Gets path relative to workspace root, expected to be called with __FILE__ as
+// an argument
+std::string get_path_relative_to_workspace(const std::string &path);
+
 } // namespace codspeed
 
 #endif // CODSPEED_H
