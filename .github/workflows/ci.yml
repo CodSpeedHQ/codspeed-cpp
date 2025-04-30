@@ -39,6 +39,28 @@ jobs:
       with:
         name: test_results
         path: ${{runner.workspace}}/core/build-tests/test/test-results/**/*.json
+
+  cmake-integration-tests:
+    strategy:
+      matrix:
+        codspeed-mode:
+          - "instrumentation"
+          - "off"
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Cache build
+      uses: actions/cache@v3
+      with:
+        path: examples/google_benchmark_cmake/build
+        key: ${{ runner.os }}-build-${{ matrix.codspeed-mode }}-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark_cmake/**') }}
+
+      - name: Build and run benchmarks
+        run: |
+          bazel run //examples/google_benchmark:my_benchmark
   
   instrumentation:
     runs-on: ubuntu-latest

@@ -12,7 +12,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(include)
 
 # Add the library
-add_library(codspeed src/codspeed.cpp src/walltime.cpp src/uri.cpp)
+add_library(
+    codspeed
+    src/codspeed.cpp
+    src/walltime.cpp
+    src/uri.cpp
+    src/workspace.cpp
+)
 
 # Version
 add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
@@ -31,7 +37,7 @@ endif()
 
 execute_process(
     COMMAND git rev-parse --show-toplevel
-    OUTPUT_VARIABLE GIT_ROOT_DIR
+    OUTPUT_VARIABLE CODSPEED_ROOT_DIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
     RESULT_VARIABLE GIT_COMMAND_RESULT
 )
@@ -44,13 +50,14 @@ if(NOT GIT_COMMAND_RESULT EQUAL 0)
         Continuing, but codspeed features will not be useable"
     )
     # Default to user's cmake source directory
-    set(GIT_ROOT_DIR ${CMAKE_SOURCE_DIR})
+    set(CODSPEED_ROOT_DIR ${CMAKE_SOURCE_DIR})
 endif()
 
 target_compile_definitions(
     codspeed
-    INTERFACE -DCODSPEED_GIT_ROOT_DIR="${GIT_ROOT_DIR}"
+    PRIVATE -DCODSPEED_ROOT_DIR="${CODSPEED_ROOT_DIR}"
 )
+message(STATUS "Using codspeed root directory: ${CODSPEED_ROOT_DIR}")
 
 set(CODSPEED_MODE_ALLOWED_VALUES "off" "instrumentation" "walltime")
 set(CODSPEED_MODE "off" CACHE STRING "Build mode for Codspeed")
