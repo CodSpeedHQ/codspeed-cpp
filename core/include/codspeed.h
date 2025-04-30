@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+namespace codspeed {
+
 class CodSpeed {
 public:
   // Public static method to access the single instance
@@ -43,5 +45,7 @@ void generate_codspeed_walltime_report(
 
 std::string extract_lambda_namespace(const std::string &pretty_func);
 std::string sanitize_bench_args(std::string &text);
+
+} // namespace codspeed
 
 #endif // CODSPEED_H

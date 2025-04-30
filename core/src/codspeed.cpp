@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+namespace codspeed {
 // Remove any `::` between brackets at the end to not mess with the URI
 // parsing
 // FIXME: Remove this bandaid when we migrate to structured benchmark metadata
@@ -91,3 +92,5 @@ void CodSpeed::end_benchmark() {
   std::cerr << action_str << ": " << current_benchmark << group_str
             << std::endl;
 }
+
+} // namespace codspeed
