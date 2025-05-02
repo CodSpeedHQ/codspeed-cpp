@@ -1,0 +1,10 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "codspeed_cpp",
+    # urls = ["https://github.com/CodSpeedHQ/codspeed-cpp/archive/refs/heads/main.zip"],
+    # strip_prefix = "codspeed-cpp-main",
+    urls = ["https://github.com/CodSpeedHQ/codspeed-cpp/archive/refs/heads/cod-815-bazel-support-for-c-integration.zip"],
+    strip_prefix = "codspeed-cpp-cod-815-bazel-support-for-c-integration",
+)
+

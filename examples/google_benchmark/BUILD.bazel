@@ -2,6 +2,6 @@ cc_binary(
     name = "my_benchmark",
     srcs = glob(["*.cpp", "*.hpp"]),
     deps = [
-        "//google_benchmark:benchmark",
+        "@codspeed_cpp//google_benchmark:benchmark",
     ],
 )
