@@ -52,14 +52,14 @@ target_compile_definitions(
     INTERFACE -DCODSPEED_GIT_ROOT_DIR="${GIT_ROOT_DIR}"
 )
 
-set(CODSPEED_MODE_ALLOWED_VALUES "OFF" "instrumentation" "walltime")
-set(CODSPEED_MODE "OFF" CACHE STRING "Build mode for Codspeed")
+set(CODSPEED_MODE_ALLOWED_VALUES "off" "instrumentation" "walltime")
+set(CODSPEED_MODE "off" CACHE STRING "Build mode for Codspeed")
 set_property(
     CACHE CODSPEED_MODE
     PROPERTY STRINGS ${CODSPEED_MODE_ALLOWED_VALUES}
 )
 
-if(NOT CODSPEED_MODE STREQUAL "OFF")
+if(NOT CODSPEED_MODE STREQUAL "off")
     target_compile_definitions(codspeed INTERFACE -DCODSPEED_ENABLED)
 
     if(NOT CMAKE_BUILD_TYPE)
