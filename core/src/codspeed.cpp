@@ -1,8 +1,10 @@
-#include "measurement.hpp"
 #include <codspeed.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
+
+#include "measurement.hpp"
 
 namespace codspeed {
 // Remove any `::` between brackets at the end to not mess with the URI
@@ -93,4 +95,4 @@ void CodSpeed::end_benchmark() {
             << std::endl;
 }
 
-} // namespace codspeed
+}  // namespace codspeed

@@ -1,6 +1,7 @@
-#include "codspeed.h"
 #include <iostream>
 #include <string>
+
+#include "codspeed.h"
 
 namespace codspeed {
 
@@ -13,7 +14,7 @@ std::string extract_namespace_clang(const std::string &pretty_func) {
   if (space_pos == std::string::npos || anon_class_pos == std::string::npos) {
     return {};
   }
-  space_pos += 1; // Skip the space
+  space_pos += 1;  // Skip the space
 
   return pretty_func.substr(space_pos, anon_class_pos - space_pos) + "::";
 }
@@ -50,4 +51,4 @@ std::string extract_lambda_namespace(const std::string &pretty_func) {
 #endif
 }
 
-} // namespace codspeed
+}  // namespace codspeed

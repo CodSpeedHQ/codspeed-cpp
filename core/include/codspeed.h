@@ -7,7 +7,7 @@
 namespace codspeed {
 
 class CodSpeed {
-public:
+ public:
   // Public static method to access the single instance
   static CodSpeed *getInstance() {
     static CodSpeed instance;
@@ -20,7 +20,7 @@ public:
   void start_benchmark(const std::string &name);
   void end_benchmark();
 
-private:
+ private:
   // Private constructor to prevent direct instantiation
   CodSpeed();
   std::vector<std::string> benchmarked;
@@ -50,6 +50,6 @@ std::string sanitize_bench_args(std::string &text);
 // an argument
 std::string get_path_relative_to_workspace(const std::string &path);
 
-} // namespace codspeed
+}  // namespace codspeed
 
-#endif // CODSPEED_H
+#endif  // CODSPEED_H

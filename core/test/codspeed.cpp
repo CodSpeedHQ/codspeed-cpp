@@ -1,4 +1,5 @@
 #include "codspeed.h"
+
 #include <gtest/gtest.h>
 
 // Manual definition (to avoid including it in the public header):

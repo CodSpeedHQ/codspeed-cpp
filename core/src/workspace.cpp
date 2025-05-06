@@ -1,7 +1,8 @@
 // Implementation
-#include "codspeed.h"
 #include <cstdlib>
 #include <filesystem>
+
+#include "codspeed.h"
 
 namespace codspeed {
 
@@ -22,4 +23,4 @@ std::string get_path_relative_to_workspace(const std::string &path) {
       .string();
 }
 
-} // namespace codspeed
+}  // namespace codspeed

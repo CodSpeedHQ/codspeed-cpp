@@ -1,8 +1,9 @@
 #ifndef MEASUREMENT_H
 #define MEASUREMENT_H
 
-#include "callgrind.h"
 #include <string>
+
+#include "callgrind.h"
 
 inline std::string get_version() {
 #ifdef CODSPEED_VERSION
@@ -29,4 +30,4 @@ inline void measurement_stop(const std::string &name) {
   CALLGRIND_DUMP_STATS_AT(name.c_str());
 };
 
-#endif // MEASUREMENT_H
+#endif  // MEASUREMENT_H

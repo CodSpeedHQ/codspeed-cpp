@@ -1,4 +1,3 @@
-#include "codspeed.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -8,6 +7,8 @@
 #include <numeric>
 #include <sstream>
 #include <string>
+
+#include "codspeed.h"
 #ifdef _WIN32
 #include <process.h>
 #else
@@ -49,8 +50,7 @@ struct CodspeedWalltimeBenchmark {
 
 double compute_quantile(const std::vector<double> &data, double quantile) {
   size_t n = data.size();
-  if (n == 0)
-    return 0.0;
+  if (n == 0) return 0.0;
 
   double pos = quantile * (n - 1);
   size_t k = static_cast<size_t>(pos);
@@ -237,7 +237,7 @@ void generate_codspeed_walltime_report(
         iqr_outlier_rounds,
         stdev_outlier_rounds,
         raw_benchmark.iter_per_round,
-        0 // TODO: warmup_iters
+        0  // TODO: warmup_iters
     };
 
     codspeed_walltime_benchmarks.push_back(codspeed_benchmark);
@@ -246,4 +246,4 @@ void generate_codspeed_walltime_report(
   write_codspeed_benchmarks_to_json(codspeed_walltime_benchmarks);
 }
 
-} // namespace codspeed
+}  // namespace codspeed
