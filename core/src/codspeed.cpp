@@ -82,7 +82,6 @@ void CodSpeed::start_benchmark(const std::string &name) {
   }
 
   current_benchmark = uri;
-  measurement_start();
 }
 
 void CodSpeed::end_benchmark() {

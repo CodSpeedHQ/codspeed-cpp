@@ -97,18 +97,19 @@ State BenchmarkInstance::RunInstrumented(
     internal::ThreadManager* manager,
     internal::PerfCountersMeasurement* perf_counters_measurement,
     ProfilerManager* profiler_manager) const {
-  State st(name_.function_name, 1, args_, 0, 1, timer, manager,
-           perf_counters_measurement, profiler_manager);
   // Do one repetition to avoid flakiness due to inconcistencies in CPU cache
   // from execution order
 
   internal::ThreadTimer warmup_timer = internal::ThreadTimer::Create();
   State warmup_state(name_.function_name, 1, args_, 0, 1, &warmup_timer,
-                     manager, perf_counters_measurement, profiler_manager);
+                     manager, perf_counters_measurement, profiler_manager,
+                     NULL);
   benchmark_.Run(warmup_state);
-  codspeed->start_benchmark(name().str());
+
+  State st(name().str(), 1, args_, 0, 1, timer, manager,
+           perf_counters_measurement, profiler_manager, codspeed);
+  ;
   benchmark_.Run(st);
-  codspeed->end_benchmark();
   return st;
 }
 #endif

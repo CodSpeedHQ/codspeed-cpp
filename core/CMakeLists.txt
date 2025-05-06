@@ -32,7 +32,7 @@ target_include_directories(
 # Disable valgrind compilation errors
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # Disable the old-style-cast warning for the specific target
-    target_compile_options(codspeed PRIVATE -Wno-old-style-cast)
+    target_compile_options(codspeed INTERFACE -Wno-old-style-cast)
 endif()
 
 execute_process(

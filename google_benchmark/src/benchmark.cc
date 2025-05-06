@@ -174,10 +174,18 @@ State::State(std::string name, IterationCount max_iters,
              const std::vector<int64_t>& ranges, int thread_i, int n_threads,
              internal::ThreadTimer* timer, internal::ThreadManager* manager,
              internal::PerfCountersMeasurement* perf_counters_measurement,
-             ProfilerManager* profiler_manager)
+             ProfilerManager* profiler_manager
+#ifdef CODSPEED_INSTRUMENTATION
+             ,
+             codspeed::CodSpeed* codspeed
+#endif
+             )
     : total_iterations_(0),
       batch_leftover_(0),
       max_iterations(max_iters),
+#ifdef CODSPEED_INSTRUMENTATION
+      codspeed_(codspeed),
+#endif
       started_(false),
       finished_(false),
       skipped_(internal::NotSkipped),

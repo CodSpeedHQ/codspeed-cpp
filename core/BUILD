@@ -7,7 +7,7 @@ CODSPEED_VERSION = "1.0.0"
 cc_library(
     name = "codspeed",
     srcs = glob(["src/**/*.cpp"] + ["src/**/*.h"] + ["src/**/*.hpp"]),
-    hdrs = ["include/codspeed.h"],
+    hdrs = glob(["include/**/*.h"] + ["include/**/*.hpp"]),
     includes = ["include"],
     defines = [
         "CODSPEED_VERSION=\\\"{}\\\"".format(CODSPEED_VERSION),

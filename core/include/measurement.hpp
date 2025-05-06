@@ -20,12 +20,13 @@ inline void measurement_set_metadata() {
   CALLGRIND_DUMP_STATS_AT(metadata.c_str());
 }
 
-inline void measurement_start() {
+__attribute__((always_inline)) inline void measurement_start() {
   CALLGRIND_ZERO_STATS;
   CALLGRIND_START_INSTRUMENTATION;
 }
 
-inline void measurement_stop(const std::string &name) {
+__attribute__((always_inline)) inline void measurement_stop(
+    const std::string &name) {
   CALLGRIND_STOP_INSTRUMENTATION;
   CALLGRIND_DUMP_STATS_AT(name.c_str());
 };

@@ -183,6 +183,13 @@ BENCHMARK(BM_test)->Unit(benchmark::kMillisecond);
 
 #include "benchmark/export.h"
 
+#ifdef CODSPEED_ENABLED
+#include <codspeed.h>
+#include <measurement.hpp>
+
+#include <filesystem>
+#endif // CODSPEED_ENABLED
+
 #if defined(_MSC_VER)
 #include <intrin.h>  // for _ReadWriteBarrier
 #endif
@@ -939,6 +946,9 @@ class BENCHMARK_EXPORT BENCHMARK_INTERNAL_CACHELINE_ALIGNED State {
 
  public:
   const IterationCount max_iterations;
+#ifdef CODSPEED_INSTRUMENTATION
+  codspeed::CodSpeed *codspeed_;
+#endif
 
  private:
   bool started_;
@@ -959,7 +969,12 @@ class BENCHMARK_EXPORT BENCHMARK_INTERNAL_CACHELINE_ALIGNED State {
         const std::vector<int64_t>& ranges, int thread_i, int n_threads,
         internal::ThreadTimer* timer, internal::ThreadManager* manager,
         internal::PerfCountersMeasurement* perf_counters_measurement,
-        ProfilerManager* profiler_manager);
+        ProfilerManager* profiler_manager
+  #ifdef CODSPEED_INSTRUMENTATION
+        ,
+        codspeed::CodSpeed *codspeed = NULL
+  #endif
+        );
 
   void StartKeepRunning();
   // Implementation of KeepRunning() and KeepRunningBatch().
@@ -1049,6 +1064,11 @@ struct State::StateIterator {
   BENCHMARK_ALWAYS_INLINE
   bool operator!=(StateIterator const&) const {
     if (BENCHMARK_BUILTIN_EXPECT(cached_ != 0, true)) return true;
+#ifdef CODSPEED_INSTRUMENTATION
+    if (parent_->codspeed_ != NULL) {
+      parent_->codspeed_->end_benchmark();
+    }
+#endif
     parent_->FinishKeepRunning();
     return false;
   }
@@ -1063,6 +1083,12 @@ inline BENCHMARK_ALWAYS_INLINE State::StateIterator State::begin() {
 }
 inline BENCHMARK_ALWAYS_INLINE State::StateIterator State::end() {
   StartKeepRunning();
+#ifdef CODSPEED_INSTRUMENTATION
+  if (this->codspeed_ != NULL) {
+    this->codspeed_->start_benchmark(name_);
+    measurement_start();
+  }
+#endif
   return StateIterator();
 }
 
@@ -1439,10 +1465,6 @@ class Fixture : public internal::Benchmark {
       n) [[maybe_unused]]
 
 #ifdef CODSPEED_ENABLED
-#include <codspeed.h>
-
-#include <filesystem>
-
 #define CUR_FILE \
   codspeed::get_path_relative_to_workspace(__FILE__) + "::"
 #define NAMESPACE \
