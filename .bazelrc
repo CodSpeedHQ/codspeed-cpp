@@ -1,1 +1,3 @@
 build --//core:codspeed_mode=instrumentation
+build --compilation_mode=dbg
+build --copt=-O2

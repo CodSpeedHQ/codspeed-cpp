@@ -10,133 +10,104 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps: 
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Cache build
-      uses: actions/cache@v3
-      with:
-        path: core/build-tests
-        key: ${{ runner.os }}-build-tests-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark/**') }}
+      - name: Cache build
+        uses: actions/cache@v3
+        with:
+          path: core/build-tests
+          key: ${{ runner.os }}-build-tests-${{ hashFiles('**/CMakeLists.txt') }}
 
-    - name: Create build directory
-      run: mkdir -p core/build-tests
+      - name: Create build directory
+        run: mkdir -p core/build-tests
 
-    - name: Build tests
-      run: |
-        cd core/build-tests
-        cmake .. -DENABLE_TESTS=ON
-        make -j
+      - name: Build tests
+        run: |
+          cd core/build-tests
+          cmake .. -DENABLE_TESTS=ON
+          make -j
 
-    - name: Run tests
-      run: | 
-        cd core/build-tests
-        GTEST_OUTPUT=json:test-results/ ctest
+      - name: Run tests
+        run: | 
+          cd core/build-tests
+          GTEST_OUTPUT=json:test-results/ ctest
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: test_results
-        path: ${{runner.workspace}}/core/build-tests/test/test-results/**/*.json
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test_results
+          path: ${{runner.workspace}}/core/build-tests/test/test-results/**/*.json
 
   cmake-integration-tests:
     strategy:
       matrix:
-        codspeed-mode:
-          - "instrumentation"
-          - "off"
-    runs-on: ubuntu-latest
-
+        include:
+          - codspeed-mode: "instrumentation"
+            runner: "ubuntu-latest"
+          - codspeed-mode: "walltime"
+            runner: "codspeed-macro"
+          - codspeed-mode: "off"
+            runner: "ubuntu-latest"
+    runs-on: ${{ matrix.runner }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Cache build
-      uses: actions/cache@v3
-      with:
-        path: examples/google_benchmark_cmake/build
-        key: ${{ runner.os }}-build-${{ matrix.codspeed-mode }}-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark_cmake/**') }}
+      - name: Cache build
+        uses: actions/cache@v3
+        with:
+          path: examples/google_benchmark_cmake/build
+          key: ${{ runner.os }}-build-${{ matrix.codspeed-mode }}-${{ hashFiles('**/CMakeLists.txt') }}
+
+      - name: Create build directory
+        run: mkdir -p examples/google_benchmark_cmake/build
+
+      - name: Build benchmark example
+        run: |
+          cd examples/google_benchmark_cmake/build
+          cmake -DCODSPEED_MODE=${{ matrix.codspeed-mode }} ..
+          make -j
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@main
+        if: matrix.codspeed-mode != 'off'
+        with:
+          run: examples/google_benchmark_cmake/build/benchmark_example
+          token: ${{ secrets.CODSPEED_TOKEN }}
+
+  bazel-integration-tests:
+    strategy:
+      matrix:
+        include:
+          - codspeed-mode: "instrumentation"
+            runner: "ubuntu-latest"
+          - codspeed-mode: "walltime"
+            runner: "codspeed-macro"
+          - codspeed-mode: "off"
+            runner: "ubuntu-latest"
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.14.0
+        with:
+          # Avoid downloading Bazel every time.
+          bazelisk-cache: true
+          # Store build cache per workflow.
+          disk-cache: ${{ github.workflow }}
+          # Share repository cache between workflows.
+          repository-cache: true
 
       - name: Build and run benchmarks
         run: |
-          bazel run //examples/google_benchmark:my_benchmark
+          bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
   
-  instrumentation:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Cache build
-      uses: actions/cache@v3
-      with:
-        path: examples/google_benchmark/build-instrumentation
-        key: ${{ runner.os }}-build-instrumentation-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark/**') }}
-
-    - name: Create build directory
-      run: mkdir -p examples/google_benchmark/build-instrumentation
-
-    - name: Build instrumentation benchmark example
-      run: |
-        cd examples/google_benchmark/build-instrumentation
-        cmake -DCODSPEED_MODE=instrumentation ..
-        make -j
-
-    - name: Run the benchmarks
-      uses: CodSpeedHQ/action@main
-      with:
-        run: examples/google_benchmark/build-instrumentation/benchmark_example
-        token: ${{ secrets.CODSPEED_TOKEN }}
-
-  walltime:
-    runs-on: codspeed-macro
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Cache build
-      uses: actions/cache@v3
-      with:
-        path: examples/google_benchmark/build-walltime
-        key: ${{ runner.os }}-build-walltime-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark/**') }}
-
-    - name: Create build directory
-      run: mkdir -p examples/google_benchmark/build-walltime
-
-    - name: Build walltime benchmark example
-      run: |
-        cd examples/google_benchmark/build-walltime
-        cmake -DCODSPEED_MODE=walltime ..
-        make -j
-
-    - name: Run the benchmarks
-      uses: CodSpeedHQ/action@main
-      with:
-        run: examples/google_benchmark/build-walltime/benchmark_example
-        token: ${{ secrets.CODSPEED_TOKEN }}
-
-
-  build-no-codspeed:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Cache build
-      uses: actions/cache@v3
-      with:
-        path: examples/google_benchmark/build-no-codspeed
-        key: ${{ runner.os }}-build-no-codspeed-${{ hashFiles('**/CMakeLists.txt', '**/examples/google_benchmark/**') }}
-
-    - name: Create build directory
-      run: mkdir -p examples/google_benchmark/build-no-codspeed
-
-    - name: Build benchmark example without codspeed
-      run: |
-        cd examples/google_benchmark/build-no-codspeed
-        cmake  ..
-        make -j
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@main
+        if: matrix.codspeed-mode != 'off'
+        with:
+          run: bazel run //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
+          token: ${{ secrets.CODSPEED_TOKEN }}
