@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-CODSPEED_VERSION = "1.0.0"
+CODSPEED_VERSION = "1.1.0"
 
 # Define the codspeed library
 cc_library(
