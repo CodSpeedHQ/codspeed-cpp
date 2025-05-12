@@ -1,3 +1,6 @@
 build --//core:codspeed_mode=instrumentation
 build --compilation_mode=dbg
 build --copt=-O2
+
+# Flip this early to avoid breaking compatibility once it becomes the default.
+build --incompatible_disallow_empty_glob
