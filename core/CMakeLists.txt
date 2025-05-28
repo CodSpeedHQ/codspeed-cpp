@@ -97,6 +97,22 @@ if(NOT CODSPEED_MODE STREQUAL "off")
     endif()
 endif()
 
+install(
+    FILES
+        include/codspeed.h # or wherever codspeed.h is located in core/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/benchmark
+    # Or possibly: DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(
+    TARGETS codspeed
+    EXPORT codspeed-targets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
 message(STATUS "Codspeed mode: ${CODSPEED_MODE}")
 
 option(ENABLE_TESTS "Enable building the unit tests which depend on gtest" OFF)
