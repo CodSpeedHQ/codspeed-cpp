@@ -35,28 +35,38 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(codspeed INTERFACE -Wno-old-style-cast)
 endif()
 
-execute_process(
-    COMMAND git rev-parse --show-toplevel
-    OUTPUT_VARIABLE CODSPEED_ROOT_DIR
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    RESULT_VARIABLE GIT_COMMAND_RESULT
-)
+# Allow the user to override CODSPEED_ROOT_DIR from the command line
+set(CODSPEED_ROOT_DIR "" CACHE PATH "Root directory for Codspeed")
 
-if(NOT GIT_COMMAND_RESULT EQUAL 0)
-    message(
-        WARNING
-        "Failed to determine the git root directory.\
-        Check that git is in your PATH, and that you are in a git repository.\
-        Continuing, but codspeed features will not be useable"
+if(NOT CODSPEED_ROOT_DIR)
+    execute_process(
+        COMMAND git rev-parse --show-toplevel
+        OUTPUT_VARIABLE CODSPEED_ROOT_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE GIT_COMMAND_RESULT
     )
-    # Default to user's cmake source directory
-    set(CODSPEED_ROOT_DIR ${CMAKE_SOURCE_DIR})
+
+    if(GIT_COMMAND_RESULT EQUAL 0)
+        message(STATUS "Detected Codspeed root directory: ${CODSPEED_ROOT_DIR}")
+    else()
+        message(
+            WARNING
+            "CODSPEED_ROOT_DIR will default to PWD at runtime as git detection failed."
+        )
+    endif()
+else()
+    message(
+        STATUS
+        "Using user-specified Codspeed root directory: ${CODSPEED_ROOT_DIR}"
+    )
 endif()
 
+# Define the CODSPEED_ROOT_DIR macro for the target
 target_compile_definitions(
     codspeed
     PRIVATE -DCODSPEED_ROOT_DIR="${CODSPEED_ROOT_DIR}"
 )
+
 message(STATUS "Using codspeed root directory: ${CODSPEED_ROOT_DIR}")
 
 set(CODSPEED_MODE_ALLOWED_VALUES "off" "instrumentation" "walltime")
@@ -98,10 +108,11 @@ if(NOT CODSPEED_MODE STREQUAL "off")
 endif()
 
 install(
-    FILES
-        include/codspeed.h # or wherever codspeed.h is located in core/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/benchmark
-    # Or possibly: DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DIRECTORY "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include"
+    DESTINATION /usr/local
+    FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "*.hpp"
 )
 
 install(
