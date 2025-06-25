@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
 
       - name: Cache build
         uses: actions/cache@v3
@@ -54,6 +56,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
 
       - name: Cache build
         uses: actions/cache@v3
@@ -92,6 +96,8 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
 
       - name: Set up Bazel
         uses: bazel-contrib/setup-bazel@0.14.0
@@ -124,6 +130,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
 
       - name: Cache build
         uses: actions/cache@v3
@@ -152,6 +160,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
 
       - name: Set up Bazel
         uses: bazel-contrib/setup-bazel@0.14.0
