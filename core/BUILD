@@ -6,7 +6,7 @@ CODSPEED_VERSION = "1.1.1"
 # Define the codspeed library
 cc_library(
     name = "codspeed",
-    srcs = glob(["src/**/*.cpp"]),
+    srcs = glob(["src/**/*.cpp"] + ["src/**/*.h"]),
     hdrs = glob(["include/**/*.h"] + ["include/**/*.hpp"]),
     includes = ["include"],
     defines = [

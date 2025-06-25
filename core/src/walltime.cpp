@@ -9,6 +9,7 @@
 #include <string>
 
 #include "codspeed.h"
+#include "utils.h"
 #ifdef _WIN32
 #include <process.h>
 #else
@@ -31,7 +32,7 @@ struct BenchmarkStats {
   double total_time;
   uint64_t iqr_outlier_rounds;
   uint64_t stdev_outlier_rounds;
-  long iter_per_round;
+  uint64_t iter_per_round;
   uint64_t warmup_iters;
 };
 
@@ -169,8 +170,8 @@ void write_codspeed_benchmarks_to_json(
   oss << "}";
 
   // Determine the directory path
-  const char *profile_folder = std::getenv("CODSPEED_PROFILE_FOLDER");
-  std::string directory = profile_folder ? profile_folder : ".";
+  std::string profile_folder = safe_getenv("CODSPEED_PROFILE_FOLDER");
+  std::string directory = profile_folder.empty() ? "." : profile_folder;
 
   // Create the results directory if it does not exist
   std::filesystem::path results_path = directory + "/results";
