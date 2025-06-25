@@ -18,9 +18,6 @@
 
 namespace codspeed {
 
-const double IQR_OUTLIER_FACTOR = 1.5;
-const double STDEV_OUTLIER_FACTOR = 3.0;
-
 // Times are per iteration
 struct BenchmarkStats {
   double min_ns;
@@ -63,8 +60,7 @@ double compute_quantile(const std::vector<double> &data, double quantile) {
 }
 
 void compute_iqr_and_outliers(const std::vector<double> &times_ns, double mean,
-                              double median, double stdev, double &q1,
-                              double &q3, double &iqr,
+                              double stdev, double &q1, double &q3, double &iqr,
                               size_t &iqr_outlier_rounds,
                               size_t &stdev_outlier_rounds) {
   std::vector<double> sorted_times = times_ns;
@@ -217,9 +213,8 @@ void generate_codspeed_walltime_report(
     double stdev = raw_benchmark.stdev_ns;
     double q1, q3, iqr;
     size_t iqr_outlier_rounds, stdev_outlier_rounds;
-    compute_iqr_and_outliers(raw_benchmark.round_times_ns, mean, median, stdev,
-                             q1, q3, iqr, iqr_outlier_rounds,
-                             stdev_outlier_rounds);
+    compute_iqr_and_outliers(raw_benchmark.round_times_ns, mean, stdev, q1, q3,
+                             iqr, iqr_outlier_rounds, stdev_outlier_rounds);
 
     // Populate stats
     codspeed_benchmark.stats = {
