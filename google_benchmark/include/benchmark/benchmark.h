@@ -1459,14 +1459,16 @@ class Fixture : public internal::Benchmark {
 #define BENCHMARK_PRIVATE_CONCAT_NAME(BaseClass, Method) \
   BaseClass##_##Method##_Benchmark
 
-#define BENCHMARK_PRIVATE_DECLARE(n)                                           \
-  /* NOLINTNEXTLINE(misc-use-anonymous-namespace) */                           \
-  static ::benchmark::internal::Benchmark const* const BENCHMARK_PRIVATE_NAME( \
-      n) [[maybe_unused]]
+#define BENCHMARK_PRIVATE_DECLARE(n)                 \
+  /* NOLINTNEXTLINE(misc-use-anonymous-namespace) */ \
+  static ::benchmark::internal::Benchmark const* const BENCHMARK_PRIVATE_NAME(n)
 
 #ifdef CODSPEED_ENABLED
-#define CUR_FILE \
-  codspeed::get_path_relative_to_workspace(__FILE__) + "::"
+#define CUR_FILE codspeed::get_path_relative_to_workspace(__FILE__) + "::"
+#ifdef _MSC_VER
+// TODO: __PRETTY_FUNCTION__ is not available in MSVC and we dont support
+#define __PRETTY_FUNCTION__ "unsupported"
+#endif
 #define NAMESPACE \
   (([]() { return codspeed::extract_lambda_namespace(__PRETTY_FUNCTION__); })())
 #define STATIC_NAMESPACE_STRING(name) static std::string name = NAMESPACE;

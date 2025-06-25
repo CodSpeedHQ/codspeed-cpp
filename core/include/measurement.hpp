@@ -3,7 +3,9 @@
 
 #include <string>
 
+#ifdef CODSPEED_INSTRUMENTATION
 #include "callgrind.h"
+#endif
 
 inline std::string get_version() {
 #ifdef CODSPEED_VERSION
@@ -13,6 +15,7 @@ inline std::string get_version() {
 #endif
 }
 
+#ifdef CODSPEED_INSTRUMENTATION
 inline bool measurement_is_instrumented() { return RUNNING_ON_VALGRIND; }
 
 inline void measurement_set_metadata() {
@@ -30,5 +33,12 @@ __attribute__((always_inline)) inline void measurement_stop(
   CALLGRIND_STOP_INSTRUMENTATION;
   CALLGRIND_DUMP_STATS_AT(name.c_str());
 };
+#else
+// Stub implementations for non-instrumentation builds
+inline bool measurement_is_instrumented() { return false; }
+inline void measurement_set_metadata() {}
+inline void measurement_start() {}
+inline void measurement_stop(const std::string &name) { (void)name; }
+#endif
 
 #endif  // MEASUREMENT_H

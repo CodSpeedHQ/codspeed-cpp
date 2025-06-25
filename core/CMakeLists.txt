@@ -77,7 +77,7 @@ set_property(
 )
 
 if(NOT CODSPEED_MODE STREQUAL "off")
-    target_compile_definitions(codspeed INTERFACE -DCODSPEED_ENABLED)
+    target_compile_definitions(codspeed PUBLIC -DCODSPEED_ENABLED)
 
     if(NOT CMAKE_BUILD_TYPE)
         message(
@@ -95,10 +95,10 @@ if(NOT CODSPEED_MODE STREQUAL "off")
     if(CODSPEED_MODE STREQUAL "instrumentation")
         target_compile_definitions(
             codspeed
-            INTERFACE -DCODSPEED_INSTRUMENTATION
+            PUBLIC -DCODSPEED_INSTRUMENTATION
         )
     elseif(CODSPEED_MODE STREQUAL "walltime")
-        target_compile_definitions(codspeed INTERFACE -DCODSPEED_WALLTIME)
+        target_compile_definitions(codspeed PUBLIC -DCODSPEED_WALLTIME)
     else()
         message(
             FATAL_ERROR

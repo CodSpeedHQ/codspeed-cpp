@@ -1,6 +1,7 @@
 #ifndef CODSPEED_H
 #define CODSPEED_H
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -33,7 +34,7 @@ class CodSpeed {
 struct RawWalltimeBenchmark {
   std::string name;
   std::string uri;
-  long iter_per_round;
+  uint64_t iter_per_round;
   double mean_ns;
   double median_ns;
   double stdev_ns;

@@ -3,12 +3,21 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 CODSPEED_VERSION = "1.1.1"
 
+config_setting(
+    name = "windows",
+    constraint_values = ["@platforms//os:windows"],
+)
+
 # Define the codspeed library
 cc_library(
     name = "codspeed",
     srcs = glob(["src/**/*.cpp"] + ["src/**/*.h"]),
     hdrs = glob(["include/**/*.h"] + ["include/**/*.hpp"]),
     includes = ["include"],
+    copts = select({
+        ":windows": ["/std:c++17"],
+        "//conditions:default": [],
+    }),
     defines = [
         "CODSPEED_VERSION=\\\"{}\\\"".format(CODSPEED_VERSION),
     ] + select({

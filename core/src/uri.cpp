@@ -46,6 +46,10 @@ std::string extract_lambda_namespace(const std::string &pretty_func) {
   return extract_namespace_clang(pretty_func);
 #elif __GNUC__
   return extract_namespace_gcc(pretty_func);
+#elif _MSC_VER
+  // MSVC doesn't support __PRETTY_FUNCTION__ in the same way
+  // Return empty string as fallback for Windows
+  return {};
 #else
 #error "Unsupported compiler"
 #endif

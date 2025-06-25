@@ -76,7 +76,7 @@ void CodSpeed::start_benchmark(const std::string &name) {
 
   // Sanity check URI and add a placeholder if format is wrong
   if (name.find("::") == std::string::npos) {
-    std::string uri = "unknown_file::" + name;
+    uri = "unknown_file::" + name;
     std::cout << "WARNING: Benchmark name does not contain '::'. Using URI: "
               << uri << std::endl;
   }
