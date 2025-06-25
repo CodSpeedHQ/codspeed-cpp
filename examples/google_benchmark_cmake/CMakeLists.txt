@@ -3,6 +3,11 @@ include(FetchContent)
 
 project(codspeed_picobench_compat VERSION 0.0.0 LANGUAGES CXX)
 
+# Treat warnings as errors
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wall -Wextra -Werror)
+endif()
+
 # On the small benchmarks of this repo, most of the benches will be optimized out, but this is expected.
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
