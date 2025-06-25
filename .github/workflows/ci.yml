@@ -111,3 +111,55 @@ jobs:
         with:
           run: bazel run //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
           token: ${{ secrets.CODSPEED_TOKEN }}
+
+  windows-cmake-build:
+    strategy:
+      matrix:
+        codspeed-mode: ["off", "walltime"]
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache build
+        uses: actions/cache@v3
+        with:
+          path: examples/google_benchmark_cmake/build
+          key: ${{ runner.os }}-build-${{ matrix.codspeed-mode }}-${{ hashFiles('**/CMakeLists.txt') }}
+
+      - name: Create build directory
+        run: |
+          if (-not (Test-Path examples\google_benchmark_cmake\build)) {
+            mkdir examples\google_benchmark_cmake\build
+          }
+        shell: pwsh
+
+      - name: Build benchmark example
+        run: |
+          cd examples\google_benchmark_cmake\build
+          cmake -DCODSPEED_MODE=${{ matrix.codspeed-mode }} ..
+          cmake --build . --config Release
+        shell: pwsh
+
+  windows-bazel-build:
+    strategy:
+      matrix:
+        codspeed-mode: ["off", "walltime"]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.14.0
+        with:
+          # Avoid downloading Bazel every time.
+          bazelisk-cache: true
+          # Store build cache per workflow.
+          disk-cache: ${{ github.workflow }}
+          # Share repository cache between workflows.
+          repository-cache: true
+
+      - name: Build benchmark example
+        run: |
+          bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
+        shell: pwsh
