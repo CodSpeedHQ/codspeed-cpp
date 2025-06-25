@@ -1,7 +1,15 @@
+config_setting(
+    name = "windows",
+    constraint_values = ["@platforms//os:windows"],
+)
+
 cc_binary(
     name = "my_benchmark",
     srcs = glob(["*.cpp", "*.hpp"]),
-    copts = ["-Wall", "-Wextra", "-Werror"],
+    copts = select({
+        ":windows": ["/std:c++17", "/W4", "/WX"],
+        "//conditions:default": ["-Wall", "-Wextra", "-Werror"],
+    }),
     deps = [
         "//google_benchmark:benchmark",
     ],

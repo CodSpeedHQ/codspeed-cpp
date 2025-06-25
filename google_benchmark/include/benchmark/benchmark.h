@@ -185,10 +185,10 @@ BENCHMARK(BM_test)->Unit(benchmark::kMillisecond);
 
 #ifdef CODSPEED_ENABLED
 #include <codspeed.h>
-#include <measurement.hpp>
 
 #include <filesystem>
-#endif // CODSPEED_ENABLED
+#include <measurement.hpp>
+#endif  // CODSPEED_ENABLED
 
 #if defined(_MSC_VER)
 #include <intrin.h>  // for _ReadWriteBarrier
@@ -947,7 +947,7 @@ class BENCHMARK_EXPORT BENCHMARK_INTERNAL_CACHELINE_ALIGNED State {
  public:
   const IterationCount max_iterations;
 #ifdef CODSPEED_INSTRUMENTATION
-  codspeed::CodSpeed *codspeed_;
+  codspeed::CodSpeed* codspeed_;
 #endif
 
  private:
@@ -970,11 +970,11 @@ class BENCHMARK_EXPORT BENCHMARK_INTERNAL_CACHELINE_ALIGNED State {
         internal::ThreadTimer* timer, internal::ThreadManager* manager,
         internal::PerfCountersMeasurement* perf_counters_measurement,
         ProfilerManager* profiler_manager
-  #ifdef CODSPEED_INSTRUMENTATION
+#ifdef CODSPEED_INSTRUMENTATION
         ,
-        codspeed::CodSpeed *codspeed = NULL
-  #endif
-        );
+        codspeed::CodSpeed* codspeed = NULL
+#endif
+  );
 
   void StartKeepRunning();
   // Implementation of KeepRunning() and KeepRunningBatch().
@@ -1609,12 +1609,12 @@ class Fixture : public internal::Benchmark {
 #ifdef CODSPEED_ENABLED
 
 #define BENCHMARK_PRIVATE_DECLARE_F(BaseClass, Method)        \
-    STATIC_NAMESPACE_STRING(ns_##BaseClass##_##Method);         \
+  STATIC_NAMESPACE_STRING(ns_##BaseClass##_##Method);         \
   class BaseClass##_##Method##_Benchmark : public BaseClass { \
    public:                                                    \
     BaseClass##_##Method##_Benchmark() {                      \
       this->SetName(CUR_FILE + ns_##BaseClass##_##Method +    \
-                    #Method "[" #BaseClass "]");                  \
+                    #Method "[" #BaseClass "]");              \
     }                                                         \
                                                               \
    protected:                                                 \
@@ -1660,7 +1660,7 @@ class Fixture : public internal::Benchmark {
     void BenchmarkCase(::benchmark::State&) override;                      \
   };
 
-#else // CODSPEED_ENABLED undefined:
+#else  // CODSPEED_ENABLED undefined:
 
 #define BENCHMARK_PRIVATE_DECLARE_F(BaseClass, Method)        \
   class BaseClass##_##Method##_Benchmark : public BaseClass { \

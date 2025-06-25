@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 include(FetchContent)
 
-project(codspeed_picobench_compat VERSION 0.0.0 LANGUAGES CXX)
+project(codspeed_google_benchmark_example VERSION 0.0.0 LANGUAGES CXX)
 
 # Treat warnings as errors
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")

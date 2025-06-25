@@ -18,5 +18,12 @@ target_link_libraries(unit_tests
   GTest::gtest_main
 )
 
+# Treat warnings as errors for tests to catch issues early
+if(MSVC)
+  target_compile_options(unit_tests PRIVATE /W4 /WX)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(unit_tests PRIVATE -Wall -Wextra -Werror)
+endif()
+
 include(GoogleTest)
 gtest_discover_tests(unit_tests)
