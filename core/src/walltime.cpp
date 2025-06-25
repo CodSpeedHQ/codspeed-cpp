@@ -108,7 +108,7 @@ void write_codspeed_benchmarks_to_json(
   std::string creator_name = "codspeed-cpp";
   std::string creator_version = CODSPEED_VERSION;
 #ifdef _WIN32
-  pid_t creator_pid = _getpid();
+  auto creator_pid = _getpid();
 #else
   pid_t creator_pid = getpid();
 #endif
