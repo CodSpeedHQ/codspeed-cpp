@@ -73,6 +73,8 @@ jobs:
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         if: matrix.codspeed-mode != 'off'
+        env:
+          CODSPEED_PERF_ENABLED: true
         with:
           run: examples/google_benchmark_cmake/build/benchmark_example
           token: ${{ secrets.CODSPEED_TOKEN }}
@@ -108,6 +110,8 @@ jobs:
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         if: matrix.codspeed-mode != 'off'
+        env:
+          CODSPEED_PERF_ENABLED: true
         with:
           run: bazel run //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
           token: ${{ secrets.CODSPEED_TOKEN }}

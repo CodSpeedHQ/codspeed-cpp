@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 set(CODSPEED_VERSION 1.2.0)
 
-project(codspeed VERSION ${CODSPEED_VERSION} LANGUAGES CXX)
+project(codspeed VERSION ${CODSPEED_VERSION} LANGUAGES CXX C)
 
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -10,8 +10,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Add the include directory
 include_directories(include)
+include_directories(instrument-hooks/includes)
 
 # Add the library
+add_library(
+    instrument_hooks
+    instrument-hooks/dist/core.c
+)
+
+# Suppress warnings for the instrument_hooks library
+target_compile_options(
+    instrument_hooks
+    PRIVATE
+    -Wno-maybe-uninitialized
+    -Wno-unused-variable
+    -Wno-unused-parameter
+    -Wno-unused-but-set-variable
+    -Wno-type-limits
+)
+
+# Add the main library
 add_library(
     codspeed
     src/codspeed.cpp
@@ -20,6 +38,9 @@ add_library(
     src/workspace.cpp
 )
 
+# Link instrument_hooks to codspeed
+target_link_libraries(codspeed PRIVATE instrument_hooks)
+
 # Version
 add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
 
@@ -27,6 +48,7 @@ add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
 target_include_directories(
     codspeed
     PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/instrument-hooks/includes>
 )
 
 # Disable valgrind compilation errors
@@ -116,7 +138,7 @@ install(
 )
 
 install(
-    TARGETS codspeed
+    TARGETS codspeed instrument_hooks
     EXPORT codspeed-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
