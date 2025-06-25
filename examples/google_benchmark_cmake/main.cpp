@@ -1,11 +1,14 @@
+#include <benchmark/benchmark.h>
+
+#include <cstring>
+
 #include "fixture_bench.hpp"
 #include "template_bench.hpp"
-#include <benchmark/benchmark.h>
-#include <cstring>
 
 template <class... Args>
 void BM_Capture(benchmark::State &state, Args &&...args) {
   auto args_tuple = std::make_tuple(std::move(args)...);
+  (void)args_tuple;
   for (auto _ : state) {
   }
 }
@@ -36,8 +39,7 @@ static void BM_memcpy(benchmark::State &state) {
   char *src = new char[state.range(0)];
   char *dst = new char[state.range(0)];
   memset(src, 'x', state.range(0));
-  for (auto _ : state)
-    memcpy(dst, src, state.range(0));
+  for (auto _ : state) memcpy(dst, src, state.range(0));
   delete[] src;
   delete[] dst;
 }
