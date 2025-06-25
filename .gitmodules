@@ -1,0 +1,3 @@
+[submodule "core/instrument-hooks"]
+	path = core/instrument-hooks
+	url = https://github.com/CodSpeedHQ/instrument-hooks
