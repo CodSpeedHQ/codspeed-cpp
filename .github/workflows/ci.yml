@@ -9,7 +9,7 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    steps: 
+    steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -29,7 +29,7 @@ jobs:
           make -j
 
       - name: Run tests
-        run: | 
+        run: |
           cd core/build-tests
           GTEST_OUTPUT=json:test-results/ ctest
 
@@ -104,7 +104,7 @@ jobs:
       - name: Build and run benchmarks
         run: |
           bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
-  
+
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         if: matrix.codspeed-mode != 'off'

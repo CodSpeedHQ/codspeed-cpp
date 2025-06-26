@@ -2,11 +2,13 @@
 #define TEMPLATE_BENCH_HPP
 
 #include <benchmark/benchmark.h>
+
 #include <cstring>
 #include <string>
 
 namespace test {
-template <class T> void BM_Template(benchmark::State &state) {
+template <class T>
+void BM_Template(benchmark::State &state) {
   std::vector<T> v;
   for (auto _ : state) {
     v.push_back(T());
@@ -14,12 +16,13 @@ template <class T> void BM_Template(benchmark::State &state) {
 }
 BENCHMARK_TEMPLATE(BM_Template, int);
 BENCHMARK_TEMPLATE(BM_Template, std::string);
-} // namespace test
+}  // namespace test
 
 //
 //
 
-template <typename T> void BM_Template1(benchmark::State &state) {
+template <typename T>
+void BM_Template1(benchmark::State &state) {
   T val = T();
   for (auto _ : state) {
     benchmark::DoNotOptimize(val++);
@@ -30,7 +33,8 @@ BENCHMARK_TEMPLATE1(BM_Template1, int);
 //
 //
 
-template <typename T, typename U> void BM_Template2(benchmark::State &state) {
+template <typename T, typename U>
+void BM_Template2(benchmark::State &state) {
   T t = T();
   U u = U();
   for (auto _ : state) {
