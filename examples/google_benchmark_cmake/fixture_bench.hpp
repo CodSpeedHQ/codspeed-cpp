@@ -36,8 +36,8 @@ BENCHMARK_TEMPLATE_F(MyTemplatedFixture, IntTest, int)(benchmark::State &st) {
     benchmark::ClobberMemory();
   }
 }
-BENCHMARK_TEMPLATE_DEFINE_F(MyTemplatedFixture, DoubleTest,
-                            double)(benchmark::State &st) {
+BENCHMARK_TEMPLATE_DEFINE_F(MyTemplatedFixture, DoubleTest, double)
+(benchmark::State &st) {
   for (auto _ : st) {
     benchmark::ClobberMemory();
   }
@@ -61,8 +61,8 @@ BENCHMARK_REGISTER_F(MyTemplate1, TestA);
 
 template <typename T, typename U>
 class MyTemplate2 : public benchmark::Fixture {};
-BENCHMARK_TEMPLATE2_DEFINE_F(MyTemplate2, TestB, int,
-                             double)(benchmark::State &st) {
+BENCHMARK_TEMPLATE2_DEFINE_F(MyTemplate2, TestB, int, double)
+(benchmark::State &st) {
   for (auto _ : st) {
     benchmark::ClobberMemory();
   }

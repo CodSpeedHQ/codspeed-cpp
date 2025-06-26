@@ -1,0 +1,17 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+exclude: '^(google_benchmark/.*|core/instrument-hooks/.*|.*/build/.*|build/.*|core/include/valgrind\.h|core/include/callgrind\.h)'
+files: ^(core|examples)/.*$
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+  - repo: https://github.com/cpp-linter/cpp-linter-hooks
+    rev: v0.8.1
+    hooks:
+      - id: clang-format
+        files: \.(cpp|cc|cxx|h|hpp)$
