@@ -8,6 +8,26 @@ config_setting(
     constraint_values = ["@platforms//os:windows"],
 )
 
+# Define the instrument-hooks library separately to apply warning suppressions
+cc_library(
+    name = "instrument_hooks",
+    srcs = ["instrument-hooks/dist/core.c"],
+    hdrs = glob(["instrument-hooks/includes/*.h"]),
+    includes = ["instrument-hooks/includes"],
+    copts = select({
+        ":windows": [
+            "/wd4101",  # unreferenced local variable (equivalent to -Wno-unused-variable)
+            "/wd4189",  # local variable is initialized but not referenced (equivalent to -Wno-unused-but-set-variable)
+            "/wd4100",  # unreferenced formal parameter (equivalent to -Wno-unused-parameter)
+        ],
+        "//conditions:default": [
+            "-Wno-unused-variable",
+            "-Wno-unused-parameter",
+            "-Wno-unused-but-set-variable",
+        ],
+    }),
+)
+
 # Define the codspeed library
 cc_library(
     name = "codspeed",
@@ -25,6 +45,7 @@ cc_library(
         ":walltime_mode": ["CODSPEED_ENABLED", "CODSPEED_WALLTIME"],
         "//conditions:default": [],
     }),
+    deps = [":instrument_hooks"],
     visibility = ["//visibility:public"],
 )
 
