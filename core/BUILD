@@ -14,7 +14,18 @@ cc_library(
     srcs = ["instrument-hooks/dist/core.c"],
     hdrs = glob(["instrument-hooks/includes/*.h"]),
     includes = ["instrument-hooks/includes"],
-    copts = ["-Wno-unused-variable", "-Wno-unused-parameter", "-Wno-unused-but-set-variable"],
+    copts = select({
+        ":windows": [
+            "/wd4101",  # unreferenced local variable (equivalent to -Wno-unused-variable)
+            "/wd4189",  # local variable is initialized but not referenced (equivalent to -Wno-unused-but-set-variable)
+            "/wd4100",  # unreferenced formal parameter (equivalent to -Wno-unused-parameter)
+        ],
+        "//conditions:default": [
+            "-Wno-unused-variable",
+            "-Wno-unused-parameter",
+            "-Wno-unused-but-set-variable",
+        ],
+    }),
 )
 
 # Define the codspeed library

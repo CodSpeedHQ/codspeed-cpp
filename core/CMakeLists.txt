@@ -19,15 +19,25 @@ add_library(
 )
 
 # Suppress warnings for the instrument_hooks library
-target_compile_options(
-    instrument_hooks
-    PRIVATE
-    -Wno-maybe-uninitialized
-    -Wno-unused-variable
-    -Wno-unused-parameter
-    -Wno-unused-but-set-variable
-    -Wno-type-limits
-)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(
+        instrument_hooks
+        PRIVATE
+        -Wno-maybe-uninitialized
+        -Wno-unused-variable
+        -Wno-unused-parameter
+        -Wno-unused-but-set-variable
+        -Wno-type-limits
+    )
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(
+        instrument_hooks
+        PRIVATE
+        /wd4101  # unreferenced local variable (equivalent to -Wno-unused-variable)
+        /wd4189  # local variable is initialized but not referenced (equivalent to -Wno-unused-but-set-variable)
+        /wd4100  # unreferenced formal parameter (equivalent to -Wno-unused-parameter)
+    )
+endif()
 
 # Add the main library
 add_library(
