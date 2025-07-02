@@ -1,6 +1,6 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
-exclude: '^(google_benchmark/.*|core/instrument-hooks/.*|.*/build/.*|build/.*|core/include/valgrind\.h|core/include/callgrind\.h)'
+exclude: '^(google_benchmark/.*|.*/build/.*|build/.*|core/include/valgrind\.h|core/include/callgrind\.h)'
 files: ^(core|examples)/.*$
 
 repos:
