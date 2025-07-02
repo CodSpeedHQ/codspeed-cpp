@@ -55,6 +55,7 @@ CodSpeed::CodSpeed() : is_instrumented(measurement_is_instrumented()) {
            "be made since it's running in an unknown environment."
         << std::endl;
   }
+  measurement_init();
   measurement_set_metadata();
 }
 
@@ -85,7 +86,8 @@ void CodSpeed::start_benchmark(const std::string &name) {
 }
 
 void CodSpeed::end_benchmark() {
-  measurement_stop(current_benchmark);
+  measurement_set_executed_benchmark(current_benchmark);
+
   benchmarked.push_back(current_benchmark);
   std::string action_str = is_instrumented ? "Measured" : "Checked";
   std::string group_str =
