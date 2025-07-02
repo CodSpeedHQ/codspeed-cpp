@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 set(CODSPEED_VERSION 1.2.0)
 
-project(codspeed VERSION ${CODSPEED_VERSION} LANGUAGES CXX)
+project(codspeed VERSION ${CODSPEED_VERSION} LANGUAGES CXX C)
 
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -11,14 +11,57 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Add the include directory
 include_directories(include)
 
-# Add the library
+# Add the instrument_hooks library
+add_library(
+    instrument_hooks
+    STATIC
+    instrument-hooks/dist/core.c
+)
+
+target_include_directories(
+    instrument_hooks
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/instrument-hooks/includes>
+    $<INSTALL_INTERFACE:includes>
+)
+
+# Suppress warnings for the instrument_hooks library
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(
+        instrument_hooks
+        PRIVATE
+        -Wno-maybe-uninitialized
+        -Wno-unused-variable
+        -Wno-unused-parameter
+        -Wno-unused-but-set-variable
+        -Wno-type-limits
+    )
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(
+        instrument_hooks
+        PRIVATE
+        /wd4101  # unreferenced local variable (equivalent to -Wno-unused-variable)
+        /wd4189  # local variable is initialized but not referenced (equivalent to -Wno-unused-but-set-variable)
+        /wd4100  # unreferenced formal parameter (equivalent to -Wno-unused-parameter)
+        /wd4245  # signed/unsigned mismatch
+        /wd4132  # const object should be initialized
+        /wd4146  # unary minus operator applied to unsigned type
+    )
+endif()
+
+
+# Add the main library
 add_library(
     codspeed
     src/codspeed.cpp
+    src/measurement.cpp
     src/walltime.cpp
     src/uri.cpp
     src/workspace.cpp
 )
+
+# Link instrument_hooks to codspeed
+target_link_libraries(codspeed PRIVATE instrument_hooks)
 
 # Version
 add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
@@ -27,6 +70,7 @@ add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
 target_include_directories(
     codspeed
     PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/instrument-hooks/includes>
 )
 
 # Disable valgrind compilation errors
@@ -116,7 +160,7 @@ install(
 )
 
 install(
-    TARGETS codspeed
+    TARGETS codspeed instrument_hooks
     EXPORT codspeed-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -20,6 +20,8 @@ jobs:
     steps: 
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
 
       - name: Cache build
         uses: actions/cache@v3
@@ -62,6 +64,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
 
       - name: Cache build
         uses: actions/cache@v3
@@ -81,6 +85,8 @@ jobs:
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         if: matrix.codspeed-mode != 'off'
+        env:
+          CODSPEED_PERF_ENABLED: true
         with:
           run: examples/google_benchmark_cmake/build/benchmark_example
           token: ${{ secrets.CODSPEED_TOKEN }}
@@ -98,6 +104,8 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
 
       - name: Set up Bazel
         uses: bazel-contrib/setup-bazel@0.14.0
@@ -116,6 +124,8 @@ jobs:
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         if: matrix.codspeed-mode != 'off'
+        env:
+          CODSPEED_PERF_ENABLED: true
         with:
           run: bazel run //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
           token: ${{ secrets.CODSPEED_TOKEN }}
@@ -128,6 +138,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
 
       - name: Cache build
         uses: actions/cache@v3
@@ -156,6 +168,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
 
       - name: Set up Bazel
         uses: bazel-contrib/setup-bazel@0.14.0

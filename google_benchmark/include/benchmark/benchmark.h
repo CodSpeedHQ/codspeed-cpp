@@ -1065,6 +1065,8 @@ struct State::StateIterator {
   bool operator!=(StateIterator const&) const {
     if (BENCHMARK_BUILTIN_EXPECT(cached_ != 0, true)) return true;
 #ifdef CODSPEED_INSTRUMENTATION
+    measurement_stop();
+
     if (parent_->codspeed_ != NULL) {
       parent_->codspeed_->end_benchmark();
     }
@@ -1086,8 +1088,9 @@ inline BENCHMARK_ALWAYS_INLINE State::StateIterator State::end() {
 #ifdef CODSPEED_INSTRUMENTATION
   if (this->codspeed_ != NULL) {
     this->codspeed_->start_benchmark(name_);
-    measurement_start();
   }
+
+  measurement_start();
 #endif
   return StateIterator();
 }
