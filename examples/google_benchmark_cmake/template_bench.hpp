@@ -10,6 +10,8 @@ template <class T> void BM_Template(benchmark::State &state) {
   std::vector<T> v;
   for (auto _ : state) {
     v.push_back(T());
+    benchmark::DoNotOptimize(v);
+    benchmark::ClobberMemory();
   }
 }
 BENCHMARK_TEMPLATE(BM_Template, int);
@@ -46,6 +48,8 @@ template <typename T, class... ExtraArgs>
 void BM_Template1_Capture(benchmark::State &state, ExtraArgs &&...extra_args) {
   auto args_tuple = std::make_tuple(std::move(extra_args)...);
   for (auto _ : state) {
+    benchmark::DoNotOptimize(args_tuple);
+    benchmark::ClobberMemory();
   }
 }
 BENCHMARK_TEMPLATE1_CAPTURE(BM_Template1_Capture, void, int_string_test, 42,
