@@ -92,7 +92,7 @@ set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
 set(pkg_config "${generated_dir}/${PROJECT_NAME}.pc")
 set(pkg_config_main "${generated_dir}/${PROJECT_NAME}_main.pc")
 # TODO: Find a way to not expose codspeed headers to downstream users
-set(targets_to_export benchmark benchmark_main codspeed)
+set(targets_to_export benchmark benchmark_main codspeed instrument_hooks)
 set(targets_export_name "${PROJECT_NAME}Targets")
 
 set(namespace "${PROJECT_NAME}::")

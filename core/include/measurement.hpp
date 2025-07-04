@@ -2,10 +2,27 @@
 #define MEASUREMENT_H
 
 #include <string>
+#ifdef _WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
 
 #ifdef CODSPEED_INSTRUMENTATION
 #include "callgrind.h"
 #endif
+
+extern "C" {
+#include "core.h"
+}
+
+static InstrumentHooks* g_hooks = nullptr;
+
+inline void measurement_init() {
+  if (!g_hooks) {
+    g_hooks = instrument_hooks_init();
+  }
+}
 
 inline std::string get_version() {
 #ifdef CODSPEED_VERSION
@@ -16,29 +33,41 @@ inline std::string get_version() {
 }
 
 #ifdef CODSPEED_INSTRUMENTATION
-inline bool measurement_is_instrumented() { return RUNNING_ON_VALGRIND; }
+inline bool measurement_is_instrumented() {
+  return instrument_hooks_is_instrumented(g_hooks);
+}
 
 inline void measurement_set_metadata() {
-  std::string metadata = "Metadata: codspeed-cpp " + get_version();
-  CALLGRIND_DUMP_STATS_AT(metadata.c_str());
+  std::string version = get_version();
+  instrument_hooks_set_integration(g_hooks, "codspeed-cpp", version.c_str());
 }
 
 __attribute__((always_inline)) inline void measurement_start() {
-  CALLGRIND_ZERO_STATS;
-  CALLGRIND_START_INSTRUMENTATION;
+  instrument_hooks_start_benchmark_inline(g_hooks);
 }
 
-__attribute__((always_inline)) inline void measurement_stop(
-    const std::string &name) {
-  CALLGRIND_STOP_INSTRUMENTATION;
-  CALLGRIND_DUMP_STATS_AT(name.c_str());
-};
+__attribute__((always_inline)) inline void measurement_stop() {
+  instrument_hooks_stop_benchmark_inline(g_hooks);
+}
+
+__attribute__((always_inline)) inline void measurement_executed_benchmark(
+    const std::string& name) {
+#ifdef _WIN32
+  auto current_pid = _getpid();
+#else
+  auto current_pid = getpid();
+#endif
+  instrument_hooks_executed_benchmark(g_hooks, current_pid, name.c_str());
+}
 #else
 // Stub implementations for non-instrumentation builds
 inline bool measurement_is_instrumented() { return false; }
 inline void measurement_set_metadata() {}
 inline void measurement_start() {}
-inline void measurement_stop(const std::string &name) { (void)name; }
+inline void measurement_stop() {}
+inline void measurement_executed_benchmark(const std::string& name) {
+  (void)name;
+}
 #endif
 
 #endif  // MEASUREMENT_H
