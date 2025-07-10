@@ -114,7 +114,7 @@ State BenchmarkInstance::RunInstrumented(
 }
 #endif
 
-State BenchmarkInstance::Run(
+State BenchmarkInstance::__codspeed_root_frame__Run(
     IterationCount iters, int thread_id, internal::ThreadTimer* timer,
     internal::ThreadManager* manager,
     internal::PerfCountersMeasurement* perf_counters_measurement,
