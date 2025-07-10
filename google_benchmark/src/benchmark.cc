@@ -175,7 +175,7 @@ State::State(std::string name, IterationCount max_iters,
              internal::ThreadTimer* timer, internal::ThreadManager* manager,
              internal::PerfCountersMeasurement* perf_counters_measurement,
              ProfilerManager* profiler_manager
-#ifdef CODSPEED_INSTRUMENTATION
+#if defined(CODSPEED_INSTRUMENTATION) || defined(CODSPEED_WALLTIME)
              ,
              codspeed::CodSpeed* codspeed
 #endif
@@ -183,7 +183,7 @@ State::State(std::string name, IterationCount max_iters,
     : total_iterations_(0),
       batch_leftover_(0),
       max_iterations(max_iters),
-#ifdef CODSPEED_INSTRUMENTATION
+#if defined(CODSPEED_INSTRUMENTATION) || defined(CODSPEED_WALLTIME)
       codspeed_(codspeed),
 #endif
       started_(false),
@@ -542,6 +542,16 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
 #endif
     for (size_t repetition_index : repetition_indices) {
       internal::BenchmarkRunner& runner = runners[repetition_index];
+
+#ifdef CODSPEED_WALLTIME
+      auto codspeed = codspeed::CodSpeed::getInstance();
+      if (codspeed != nullptr) {
+        codspeed->start_benchmark(runner.GetBenchmarkName());
+      }
+
+      measurement_start();
+#endif
+      
       runner.DoOneRepetition();
       if (runner.HasRepeatsRemaining()) {
         continue;
@@ -571,6 +581,12 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
       }
 
 #ifdef CODSPEED_WALLTIME
+      measurement_stop();
+
+      if (codspeed != nullptr) {
+        codspeed->end_benchmark();
+      }
+
       codspeed_walltime_data.push_back(generate_raw_walltime_data(run_results));
 #endif
 
