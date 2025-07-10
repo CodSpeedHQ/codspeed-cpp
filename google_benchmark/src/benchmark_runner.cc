@@ -141,7 +141,7 @@ void RunInThread(const BenchmarkInstance* b, IterationCount iters,
           ? internal::ThreadTimer::CreateProcessCpuTime()
           : internal::ThreadTimer::Create());
 
-  State st = b->Run(iters, thread_id, &timer, manager,
+  State st = b->__codspeed_root_frame__Run(iters, thread_id, &timer, manager,
                     perf_counters_measurement, profiler_manager_);
   BM_CHECK(st.skipped() || st.iterations() >= st.max_iterations)
       << "Benchmark returned before State::KeepRunning() returned false!";
