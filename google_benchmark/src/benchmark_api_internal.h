@@ -52,7 +52,7 @@ class BenchmarkInstance {
   void Setup() const;
   void Teardown() const;
 
-  State Run(IterationCount iters, int thread_id, internal::ThreadTimer* timer,
+  State __codspeed_root_frame__Run(IterationCount iters, int thread_id, internal::ThreadTimer* timer,
             internal::ThreadManager* manager,
             internal::PerfCountersMeasurement* perf_counters_measurement,
             ProfilerManager* profiler_manager) const;

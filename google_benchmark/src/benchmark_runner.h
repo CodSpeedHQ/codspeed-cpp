@@ -119,6 +119,13 @@ class BenchmarkRunner {
   void FinishWarmUp(const IterationCount& i);
 
   void RunWarmUp();
+
+#ifdef CODSPEED_WALLTIME
+public:  
+  inline std::string GetBenchmarkName() {
+    return b.name().str();
+  }
+#endif
 };
 
 }  // namespace internal

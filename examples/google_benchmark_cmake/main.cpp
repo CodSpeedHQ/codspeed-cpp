@@ -2,7 +2,9 @@
 
 #include <cstring>
 
+#include "fibonacci_bench.hpp"
 #include "fixture_bench.hpp"
+#include "sleep_bench.hpp"
 #include "template_bench.hpp"
 
 template <class... Args>

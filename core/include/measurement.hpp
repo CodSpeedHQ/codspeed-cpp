@@ -2,10 +2,22 @@
 #define MEASUREMENT_H
 
 #include <string>
-
-#ifdef CODSPEED_INSTRUMENTATION
-#include "callgrind.h"
+#ifdef _WIN32
+#include <process.h>
+#define getpid _getpid
+#define ALWAYS_INLINE __forceinline
+#else
+#include <unistd.h>
+#define ALWAYS_INLINE __attribute__((always_inline)) inline
 #endif
+
+extern "C" {
+#include "core.h"
+}
+
+extern InstrumentHooks* g_hooks;
+
+void measurement_init();
 
 inline std::string get_version() {
 #ifdef CODSPEED_VERSION
@@ -15,30 +27,26 @@ inline std::string get_version() {
 #endif
 }
 
-#ifdef CODSPEED_INSTRUMENTATION
-inline bool measurement_is_instrumented() { return RUNNING_ON_VALGRIND; }
+inline bool measurement_is_instrumented() {
+  return instrument_hooks_is_instrumented(g_hooks);
+}
 
 inline void measurement_set_metadata() {
-  std::string metadata = "Metadata: codspeed-cpp " + get_version();
-  CALLGRIND_DUMP_STATS_AT(metadata.c_str());
+  std::string version = get_version();
+  instrument_hooks_set_integration(g_hooks, "codspeed-cpp", version.c_str());
 }
 
-__attribute__((always_inline)) inline void measurement_start() {
-  CALLGRIND_ZERO_STATS;
-  CALLGRIND_START_INSTRUMENTATION;
+ALWAYS_INLINE void measurement_start() {
+  instrument_hooks_start_benchmark_inline(g_hooks);
 }
 
-__attribute__((always_inline)) inline void measurement_stop(
-    const std::string &name) {
-  CALLGRIND_STOP_INSTRUMENTATION;
-  CALLGRIND_DUMP_STATS_AT(name.c_str());
-};
-#else
-// Stub implementations for non-instrumentation builds
-inline bool measurement_is_instrumented() { return false; }
-inline void measurement_set_metadata() {}
-inline void measurement_start() {}
-inline void measurement_stop(const std::string &name) { (void)name; }
-#endif
+ALWAYS_INLINE void measurement_stop() {
+  instrument_hooks_stop_benchmark_inline(g_hooks);
+}
+
+ALWAYS_INLINE void measurement_set_executed_benchmark(const std::string& name) {
+  auto current_pid = getpid();
+  instrument_hooks_executed_benchmark(g_hooks, current_pid, name.c_str());
+}
 
 #endif  // MEASUREMENT_H

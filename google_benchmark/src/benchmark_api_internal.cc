@@ -114,13 +114,18 @@ State BenchmarkInstance::RunInstrumented(
 }
 #endif
 
-State BenchmarkInstance::Run(
+State BenchmarkInstance::__codspeed_root_frame__Run(
     IterationCount iters, int thread_id, internal::ThreadTimer* timer,
     internal::ThreadManager* manager,
     internal::PerfCountersMeasurement* perf_counters_measurement,
     ProfilerManager* profiler_manager) const {
+#ifdef CODSPEED_WALLTIME
+  State st(name_.function_name, iters, args_, thread_id, threads_, timer,
+           manager, perf_counters_measurement, profiler_manager, codspeed::CodSpeed::getInstance());
+#else
   State st(name_.function_name, iters, args_, thread_id, threads_, timer,
            manager, perf_counters_measurement, profiler_manager);
+#endif
   benchmark_.Run(st);
   return st;
 }
