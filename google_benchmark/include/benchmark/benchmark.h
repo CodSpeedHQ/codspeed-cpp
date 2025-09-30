@@ -949,6 +949,9 @@ class BENCHMARK_EXPORT BENCHMARK_INTERNAL_CACHELINE_ALIGNED State {
 #if defined(CODSPEED_INSTRUMENTATION) || defined(CODSPEED_WALLTIME)
   codspeed::CodSpeed* codspeed_;
 #endif
+#ifdef CODSPEED_WALLTIME
+  uint64_t resume_timestamp_;
+#endif
 
  private:
   bool started_;
@@ -1044,11 +1047,13 @@ struct State::StateIterator {
  private:
   friend class State;
   BENCHMARK_ALWAYS_INLINE
-  StateIterator() : cached_(0), parent_() {}
+  StateIterator() : cached_(0), parent_()
+  {}
 
   BENCHMARK_ALWAYS_INLINE
   explicit StateIterator(State* st)
-      : cached_(st->skipped() ? 0 : st->max_iterations), parent_(st) {}
+      : cached_(st->skipped() ? 0 : st->max_iterations), parent_(st)
+  {}
 
  public:
   BENCHMARK_ALWAYS_INLINE
@@ -1063,7 +1068,9 @@ struct State::StateIterator {
 
   BENCHMARK_ALWAYS_INLINE
   bool operator!=(StateIterator const&) const {
-    if (BENCHMARK_BUILTIN_EXPECT(cached_ != 0, true)) return true;
+    if (BENCHMARK_BUILTIN_EXPECT(cached_ != 0, true)) {
+      return true;
+    }
 #ifdef CODSPEED_INSTRUMENTATION
     measurement_stop();
 #endif

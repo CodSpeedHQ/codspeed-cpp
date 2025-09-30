@@ -19,6 +19,10 @@
 #include "codspeed.h"
 #include "internal_macros.h"
 
+#ifdef CODSPEED_WALLTIME
+#include "measurement.hpp"
+#endif
+
 #ifndef BENCHMARK_OS_WINDOWS
 #if !defined(BENCHMARK_OS_FUCHSIA) && !defined(BENCHMARK_OS_QURT)
 #include <sys/resource.h>
@@ -186,6 +190,9 @@ State::State(std::string name, IterationCount max_iters,
 #if defined(CODSPEED_INSTRUMENTATION) || defined(CODSPEED_WALLTIME)
       codspeed_(codspeed),
 #endif
+#ifdef CODSPEED_WALLTIME
+      resume_timestamp_(0),
+#endif
       started_(false),
       finished_(false),
       skipped_(internal::NotSkipped),
@@ -252,9 +259,21 @@ State::State(std::string name, IterationCount max_iters,
 }
 
 void State::PauseTiming() {
+#ifdef CODSPEED_WALLTIME
+  uint64_t pause_timestamp = measurement_current_timestamp();
+#endif
+
   // Add in time accumulated so far
   BM_CHECK(started_ && !finished_ && !skipped());
   timer_->StopTimer();
+
+#ifdef CODSPEED_WALLTIME
+  if (resume_timestamp_ != 0) {
+    measurement_add_benchmark_timestamps(resume_timestamp_, pause_timestamp);
+    resume_timestamp_ = 0;
+  }
+#endif
+
   if (perf_counters_measurement_ != nullptr) {
     std::vector<std::pair<std::string, double>> measurements;
     if (!perf_counters_measurement_->Stop(measurements)) {
@@ -276,6 +295,11 @@ void State::ResumeTiming() {
   if (perf_counters_measurement_ != nullptr) {
     perf_counters_measurement_->Start();
   }
+
+#ifdef CODSPEED_WALLTIME
+  BM_CHECK(resume_timestamp_ == 0);
+  resume_timestamp_ = measurement_current_timestamp();
+#endif
 }
 
 void State::SkipWithMessage(const std::string& msg) {
