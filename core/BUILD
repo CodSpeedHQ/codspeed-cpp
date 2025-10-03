@@ -29,6 +29,8 @@ cc_library(
             "-Wno-unused-parameter",
             "-Wno-unused-but-set-variable",
             "-Wno-type-limits",
+            "-Wno-format",
+            "-Wno-format-security",
         ],
     }),
     visibility = ["//visibility:public"],
