@@ -19,18 +19,8 @@ NOINLINE static uint64_t recursive_fib(int n) {
 }
 
 NOINLINE static uint64_t expensive_operation() {
-  // Large memory allocation
-  std::vector<uint64_t> data(1024 * 1024, 42);  // 8 MiB allocation
-
-  // Expensive recursive computation that will dominate flamegraph
-  uint64_t fib_result = recursive_fib(30);
-
-  // More expensive work
-  uint64_t sum = std::accumulate(data.begin(), data.end(), uint64_t(0));
-  benchmark::DoNotOptimize(sum);
-  benchmark::DoNotOptimize(fib_result);
-
-  return sum + fib_result;
+  // Expensive recursive compuation that will dominate flamegraph
+  return 42 + recursive_fib(30);
 }
 
 #endif  // HELPER_HPP

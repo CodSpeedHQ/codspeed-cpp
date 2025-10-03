@@ -37,4 +37,4 @@ static void BM_large_setup(benchmark::State& state) {
     benchmark::DoNotOptimize(actual_work());
   }
 }
-BENCHMARK(BM_large_setup);
+BENCHMARK(BM_large_setup)->Iterations(100);
