@@ -28,5 +28,6 @@ git cliff -o CHANGELOG.md --tag $VERSION --github-token $GITHUB_TOKEN
 git add CHANGELOG.md
 git commit -m "chore: Release $VERSION"
 git tag $VERSION -m "Release $VERSION"
+git push origin main
 git push origin $VERSION
 gh release create $VERSION -t $VERSION --generate-notes -d
