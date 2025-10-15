@@ -67,6 +67,7 @@ string_flag(
         "instrumentation",
         "walltime",
     ],
+    visibility = ["//visibility:public"],
 )
 
 config_setting(
