@@ -128,14 +128,16 @@ jobs:
           run: bazel run //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
           token: ${{ secrets.CODSPEED_TOKEN }}
 
-  windows-cmake-build:
+  cmake-build:
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest]
         codspeed-mode: ["off", "walltime"]
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: "recursive"
 
@@ -143,27 +145,37 @@ jobs:
         uses: actions/cache@v3
         with:
           path: examples/google_benchmark_cmake/build
-          key: ${{ runner.os }}-build-${{ matrix.codspeed-mode }}-${{ hashFiles('**/CMakeLists.txt') }}
+          key: ${{ runner.os }}-cmake-build-${{ matrix.codspeed-mode }}-${{ hashFiles('**/CMakeLists.txt') }}
 
-      - name: Create build directory
+      - name: Build benchmark example (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p examples/google_benchmark_cmake/build
+          cd examples/google_benchmark_cmake/build
+          cmake -DCODSPEED_MODE=${{ matrix.codspeed-mode }} ..
+          make -j
+
+      - name: Build benchmark example (Windows)
+        if: runner.os == 'Windows'
         run: |
           if (-not (Test-Path examples\google_benchmark_cmake\build)) {
             mkdir examples\google_benchmark_cmake\build
           }
-        shell: pwsh
-
-      - name: Build benchmark example
-        run: |
           cd examples\google_benchmark_cmake\build
           cmake -DCODSPEED_MODE=${{ matrix.codspeed-mode }} ..
           cmake --build . --config Release
         shell: pwsh
 
-  windows-bazel-build:
+  bazel-build:
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest]
         codspeed-mode: ["off", "walltime"]
-    runs-on: windows-latest
+        bazel-version: ["7.6.2", "8.4.2", "9.0.0-pre.20250921.2"]
+    runs-on: ${{ matrix.os }}
+    env:
+      USE_BAZEL_VERSION: ${{ matrix.bazel-version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -182,4 +194,3 @@ jobs:
       - name: Build benchmark example
         run: |
           bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
-        shell: pwsh
