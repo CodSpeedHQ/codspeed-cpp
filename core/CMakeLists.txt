@@ -11,17 +11,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Add the include directory
 include_directories(include)
 
+include(FetchContent)
+FetchContent_Declare(
+    instrument_hooks_repo
+    GIT_REPOSITORY https://github.com/CodSpeedHQ/instrument-hooks
+    GIT_TAG b1e401a4d031ad308edb22ed59a52253a1ebe924
+)
+FetchContent_MakeAvailable(instrument_hooks_repo)
+FetchContent_GetProperties(instrument_hooks_repo)
+if(NOT instrument_hooks_repo_POPULATED)
+    FetchContent_Populate(instrument_hooks_repo)
+endif()
+set(instrument_hooks_SOURCE_DIR ${instrument_hooks_repo_SOURCE_DIR})
+
 # Add the instrument_hooks library
 add_library(
     instrument_hooks
     STATIC
-    instrument-hooks/dist/core.c
+    ${instrument_hooks_SOURCE_DIR}/dist/core.c
 )
 
 target_include_directories(
     instrument_hooks
     PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/instrument-hooks/includes>
+    $<BUILD_INTERFACE:${instrument_hooks_SOURCE_DIR}/includes>
     $<INSTALL_INTERFACE:includes>
 )
 
@@ -72,7 +85,7 @@ add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
 target_include_directories(
     codspeed
     PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/instrument-hooks/includes>
+           $<BUILD_INTERFACE:${instrument_hooks_SOURCE_DIR}/includes>
 )
 
 # Disable valgrind compilation errors
