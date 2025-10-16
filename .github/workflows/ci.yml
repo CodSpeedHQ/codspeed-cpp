@@ -40,7 +40,7 @@ jobs:
           make -j
 
       - name: Run the benchmarks
-        uses: CodSpeedHQ/action@main
+        uses: CodSpeedHQ/action@v4.1.0
         if: matrix.codspeed-mode != 'off'
         with:
           mode: ${{ matrix.codspeed-mode }}
@@ -78,7 +78,7 @@ jobs:
           bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
   
       - name: Run the benchmarks
-        uses: CodSpeedHQ/action@main
+        uses: CodSpeedHQ/action@v4.1.0
         if: matrix.codspeed-mode != 'off'
         with:
           mode: ${{ matrix.codspeed-mode }}
