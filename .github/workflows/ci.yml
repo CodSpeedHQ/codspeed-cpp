@@ -100,7 +100,6 @@ jobs:
             runner: "codspeed-macro"
           - codspeed-mode: "off"
             runner: "ubuntu-latest"
-        bazel-version: ["7.6.2", "8.4.2", "9.0.0-pre.20250921.2"]
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -120,8 +119,6 @@ jobs:
       - name: Build and run benchmarks
         run: |
           bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }}
-        env:
-          USE_BAZEL_VERSION: ${{ matrix.bazel-version }}
   
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
