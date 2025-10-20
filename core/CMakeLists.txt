@@ -38,18 +38,32 @@ target_include_directories(
     $<INSTALL_INTERFACE:includes>
 )
 
+# Option to enable strict warnings (for CI builds)
+option(CODSPEED_STRICT_WARNINGS "Enable strict warnings" OFF)
+
 # Suppress warnings for the instrument_hooks library
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # IMPORTANT: Keep in sync with instrument-hooks/ci.yml (COMMON_CFLAGS)
+    set(INSTRUMENT_HOOKS_CFLAGS
+        -Wno-format-security
+        -Wno-unused-but-set-variable
+        -Wno-unused-const-variable
+        -Wno-type-limits
+        -Wno-uninitialized
+        # When cross-compiling:
+        -Wno-constant-conversion
+        -Wno-incompatible-pointer-types
+        -Wno-unused-function
+    )
+
+    if(CODSPEED_STRICT_WARNINGS)
+        list(PREPEND INSTRUMENT_HOOKS_CFLAGS -Wall -Werror)
+    endif()
+
     target_compile_options(
         instrument_hooks
         PRIVATE
-        -Wno-maybe-uninitialized
-        -Wno-unused-variable
-        -Wno-unused-parameter
-        -Wno-unused-but-set-variable
-        -Wno-type-limits
-        -Wno-format
-        -Wno-format-security
+        ${INSTRUMENT_HOOKS_CFLAGS}
     )
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(
