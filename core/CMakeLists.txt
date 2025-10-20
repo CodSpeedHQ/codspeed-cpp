@@ -45,6 +45,7 @@ option(CODSPEED_STRICT_WARNINGS "Enable strict warnings" OFF)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # IMPORTANT: Keep in sync with instrument-hooks/ci.yml (COMMON_CFLAGS)
     set(INSTRUMENT_HOOKS_CFLAGS
+        -Wno-format
         -Wno-format-security
         -Wno-unused-but-set-variable
         -Wno-unused-const-variable

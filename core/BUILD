@@ -31,6 +31,7 @@ config_setting(
 
 # IMPORTANT: Keep in sync with instrument-hooks/ci.yml (COMMON_CFLAGS)
 instrument_hooks_cflags = [
+    "-Wno-format",
     "-Wno-format-security",
     "-Wno-unused-but-set-variable",
     "-Wno-unused-const-variable",
