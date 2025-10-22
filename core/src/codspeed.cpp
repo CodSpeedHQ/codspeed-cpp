@@ -48,14 +48,17 @@ std::string join(const std::vector<std::string> &elements,
   return result;
 }
 
-CodSpeed::CodSpeed() : is_instrumented(measurement_is_instrumented()) {
+CodSpeed::CodSpeed() {
+  // First initialize `g_hooks` before calling any measurement functions
+  measurement_init();
+
+  is_instrumented = measurement_is_instrumented();
   if (!is_instrumented) {
     std::cerr
         << "NOTICE: codspeed is enabled, but no performance measurement will "
            "be made since it's running in an unknown environment."
         << std::endl;
   }
-  measurement_init();
   measurement_set_metadata();
 }
 
