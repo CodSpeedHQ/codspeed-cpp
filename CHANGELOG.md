@@ -5,6 +5,27 @@
 
 
 
+## [1.4.0] - 2025-10-22
+
+### <!-- 0 -->🚀 Features
+- Check multiple bazel versions
+- Check multiple bazel versions on different os
+
+### <!-- 1 -->🐛 Bug Fixes
+- Initialize g_hooks before using it
+- Ignore format errors
+- Sync compiler flags with instrument-hooks; add strict mode
+- Run cmake/bazel on many os
+- Fetch instrument-hooks git repository
+- Bazel build on v8+
+- Bazel 9 build
+- Push the commit in the release script
+
+### <!-- 7 -->⚙️ Internals
+- Enable strict warnings
+- Bump instrument-hooks
+
+
 ## [1.3.0] - 2025-10-06
 
 ### <!-- 0 -->🚀 Features
@@ -131,6 +152,7 @@
 - Import google benchmark "fork"
 
 
+[1.4.0]: https://github.com/CodSpeedHQ/runner/compare/v1.3.0..v1.4.0
 [1.3.0]: https://github.com/CodSpeedHQ/runner/compare/v1.2.0..v1.3.0
 [1.2.0]: https://github.com/CodSpeedHQ/runner/compare/v1.1.1..v1.2.0
 [1.1.1]: https://github.com/CodSpeedHQ/runner/compare/v1.1.0..v1.1.1
