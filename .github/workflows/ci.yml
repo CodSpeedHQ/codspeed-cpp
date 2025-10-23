@@ -82,6 +82,7 @@ jobs:
           cmake -DCODSPEED_MODE=${{ matrix.codspeed-mode }} -DCODSPEED_STRICT_WARNINGS=ON ..
           make -j
 
+      - uses: dtolnay/rust-toolchain@stable
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@chore/runner-branch
         if: matrix.codspeed-mode != 'off'
@@ -122,6 +123,7 @@ jobs:
         run: |
           bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }} --//core:strict_warnings=on
   
+      - uses: dtolnay/rust-toolchain@stable
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@chore/runner-branch
         if: matrix.codspeed-mode != 'off'
