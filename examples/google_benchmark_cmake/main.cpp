@@ -56,7 +56,22 @@ static void BM_memcpy(benchmark::State &state) {
   delete[] src;
   delete[] dst;
 }
-
 BENCHMARK(BM_memcpy)->Range(8, 8 << 10);
+
+static inline int compute_sum(int x) {
+  int sum = 0;
+  for (int i = 0; i < x; i++) {
+    sum += i;
+  }
+  return sum;
+}
+
+static void BM_inlined_compute_sum(benchmark::State &state) {
+  for (auto _ : state) {
+    benchmark::DoNotOptimize(compute_sum(1024));
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_inlined_compute_sum);
 
 BENCHMARK_MAIN();
