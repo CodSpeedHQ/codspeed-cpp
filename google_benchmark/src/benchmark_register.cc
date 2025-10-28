@@ -474,7 +474,32 @@ Benchmark* Benchmark::ThreadPerCpu() {
   return this;
 }
 
-void Benchmark::SetName(const std::string& name) { name_ = name; }
+void Benchmark::SetName(const std::string& name) {
+#ifdef CODSPEED_ENABLED
+  // Ensure that we sanitize the URI to not run into issues when searching for `::`.
+  codspeed::sanitize_bench_args(name_);
+
+  // Preserve file path and namespace prefix if present
+  size_t separator_pos = name_.rfind("::");
+  if (separator_pos != std::string::npos) {
+    std::string file_prefix = name_.substr(0, separator_pos + 2);
+
+    // Extract any parameters from the old name (format: "file::namespace::name[param1/param2/...]")
+    size_t bracket_pos = name_.find('[', separator_pos);
+    std::string params;
+    if (bracket_pos != std::string::npos) {
+      params = name_.substr(bracket_pos);  // Include everything from '[' onwards
+    }
+
+    // Reconstruct: file_prefix + new_name + params
+    name_ = file_prefix + name + params;
+  } else {
+    name_ = name;
+  }
+#else
+  name_ = name;
+#endif
+}
 
 const char* Benchmark::GetName() const { return name_.c_str(); }
 
