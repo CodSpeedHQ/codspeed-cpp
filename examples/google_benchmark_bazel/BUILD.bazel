@@ -14,5 +14,6 @@ cc_binary(
     }),
     deps = [
         "//google_benchmark:benchmark",
+        "@nlohmann_json//:json",
     ],
 )

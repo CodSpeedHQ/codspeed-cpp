@@ -52,3 +52,19 @@ def benchmark_deps():
             strip_prefix = "libpfm-4.11.0",
             urls = ["https://sourceforge.net/projects/perfmon2/files/libpfm4/libpfm-4.11.0.tar.gz/download"],
         )
+
+    if "nlohmann_json" not in native.existing_rules():
+        http_archive(
+            name = "nlohmann_json",
+            sha256 = "b94997df68856753b72f0d7a3703b7d484d4745c567f3584ef97c96c25a5798e",
+            strip_prefix = "json-3.11.3",
+            urls = ["https://github.com/nlohmann/json/archive/refs/tags/v3.11.3.tar.gz"],
+            build_file_content = """
+cc_library(
+    name = "json",
+    hdrs = glob(["include/**/*.hpp"]),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+)
+""",
+        )

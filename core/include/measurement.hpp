@@ -29,6 +29,7 @@ inline std::string get_version() {
 }
 
 inline bool measurement_is_instrumented() {
+  printf("HELLO WORLD\n");
   return instrument_hooks_is_instrumented(g_hooks);
 }
 
