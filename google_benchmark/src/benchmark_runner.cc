@@ -466,8 +466,10 @@ void BenchmarkRunner::DoOneRepetition() {
   manager.reset(new internal::ThreadManager(b.threads()));
   internal::ThreadTimer timer = internal::ThreadTimer::Create();
   b.Setup();
+  measurement_start();
   State st = b.RunInstrumented(codspeed::CodSpeed::getInstance(), &timer,
                                manager.get(), nullptr, nullptr);
+  measurement_stop();
   b.Teardown();
 
   return;
@@ -485,6 +487,12 @@ void BenchmarkRunner::DoOneRepetition() {
   if (!warmup_done) {
     RunWarmUp();
   }
+
+  // IMPORTANT: We must not sample the warmup otherwise the flamegraph timings will be incorrect since we
+  // divide by the iteration count.
+#ifdef CODSPEED_WALLTIME
+  measurement_start();
+#endif
 
   IterationResults i;
   // We *may* be gradually increasing the length (iteration count)
@@ -519,6 +527,9 @@ void BenchmarkRunner::DoOneRepetition() {
            "if we did more iterations than we want to do the next time, "
            "then we should have accepted the current iteration run.");
   }
+#ifdef CODSPEED_WALLTIME
+  measurement_stop();
+#endif
 
   // Produce memory measurements if requested.
   MemoryManager::Result* memory_result = nullptr;

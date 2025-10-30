@@ -572,8 +572,6 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
       if (codspeed != nullptr) {
         codspeed->start_benchmark(runner.GetBenchmarkName());
       }
-
-      measurement_start();
 #endif
       
       runner.DoOneRepetition();
@@ -605,8 +603,6 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
       }
 
 #ifdef CODSPEED_WALLTIME
-      measurement_stop();
-
       if (codspeed != nullptr) {
         codspeed->end_benchmark();
       }
