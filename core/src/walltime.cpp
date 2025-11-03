@@ -207,7 +207,8 @@ void generate_codspeed_walltime_report(
 
     double total_time =
         std::accumulate(raw_benchmark.round_times_ns.begin(),
-                        raw_benchmark.round_times_ns.end(), 0.0);
+                        raw_benchmark.round_times_ns.end(), 0.0) /
+        1e9;
 
     double mean = raw_benchmark.mean_ns;
     double median = raw_benchmark.median_ns;
