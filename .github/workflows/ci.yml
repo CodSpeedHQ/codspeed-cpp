@@ -88,7 +88,8 @@ jobs:
         with:
           mode: ${{ matrix.codspeed-mode }}
           run: examples/google_benchmark_cmake/build/benchmark_example
-          token: ${{ secrets.CODSPEED_TOKEN }}
+          # token: ${{ secrets.CODSPEED_TOKEN }}
+          upload-url: https://api.staging.preview.codspeed.io/upload
 
   bazel-integration-tests:
     strategy:
@@ -126,7 +127,8 @@ jobs:
         with:
           mode: ${{ matrix.codspeed-mode }}
           run: bazel run //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }} --//core:strict_warnings=on
-          token: ${{ secrets.CODSPEED_TOKEN }}
+          # token: ${{ secrets.CODSPEED_TOKEN }}
+          upload-url: https://api.staging.preview.codspeed.io/upload
 
   cmake-build:
     strategy:
