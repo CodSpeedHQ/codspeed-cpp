@@ -94,7 +94,14 @@ BM_DEFINE_double(benchmark_min_warmup_time, 0.0);
 
 // The number of runs of each benchmark. If greater than 1, the mean and
 // standard deviation of the runs will be reported.
+// CODSPEED: change default repetitions during walltime runs in order to have
+// better statistics by default
+// https://github.com/google/benchmark/blob/main/docs/user_guide.md#reporting-statistics
+#ifdef CODSPEED_WALLTIME
+BM_DEFINE_int32(benchmark_repetitions, 5);
+#else
 BM_DEFINE_int32(benchmark_repetitions, 1);
+#endif
 
 // If enabled, forces each benchmark to execute exactly one iteration and one
 // repetition, bypassing any configured
