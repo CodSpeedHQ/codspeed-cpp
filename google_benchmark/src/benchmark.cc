@@ -382,6 +382,8 @@ void FlushStreams(BenchmarkReporter* reporter) {
 }
 
 #ifdef CODSPEED_WALLTIME
+// NOTE: What Google Benchmark calls a repetition, Codspeed calls a round.
+//
 // We use real time by default, but we could offer CPU time usage as a build
 // option, open an issue if you need it.
 codspeed::RawWalltimeBenchmark generate_raw_walltime_data(
@@ -402,27 +404,15 @@ codspeed::RawWalltimeBenchmark generate_raw_walltime_data(
       walltime_data.uri = "unknown_file::" + walltime_data.uri;
     }
 
-    walltime_data.iter_per_round = run.iterations;
-    walltime_data.round_times_ns.push_back(run.GetAdjustedRealTime());
-  }
+    // Collect iteration count for this round/repetition
+    walltime_data.iters_per_round.push_back(
+        static_cast<uint64_t>(run.iterations));
 
-  if (run_results.aggregates_only.empty()) {
-    // If run has no aggreagates, it means that only one round was performed.
-    // Use this time as a mean, median, and set stdev to 0.
-    double only_round_time_ns = walltime_data.round_times_ns[0];
-    walltime_data.mean_ns = only_round_time_ns;
-    walltime_data.median_ns = only_round_time_ns;
-    walltime_data.stdev_ns = 0;
-  } else {
-    for (const auto& aggregate_run : run_results.aggregates_only) {
-      if (aggregate_run.aggregate_name == "mean") {
-        walltime_data.mean_ns = aggregate_run.GetAdjustedRealTime();
-      } else if (aggregate_run.aggregate_name == "median") {
-        walltime_data.median_ns = aggregate_run.GetAdjustedRealTime();
-      } else if (aggregate_run.aggregate_name == "stddev") {
-        walltime_data.stdev_ns = aggregate_run.GetAdjustedRealTime();
-      }
-    }
+    // Collect total round time in nanoseconds
+    // real_accumulated_time is in seconds, convert to nanoseconds
+    double round_time_ns =
+        run.real_accumulated_time * GetTimeUnitMultiplier(kNanosecond);
+    walltime_data.times_per_round_ns.push_back(round_time_ns);
   }
 
   return walltime_data;
@@ -568,12 +558,12 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
       internal::BenchmarkRunner& runner = runners[repetition_index];
 
 #ifdef CODSPEED_WALLTIME
-      auto codspeed = codspeed::CodSpeed::getInstance();
+      auto* codspeed = codspeed::CodSpeed::getInstance();
       if (codspeed != nullptr) {
         codspeed->start_benchmark(runner.GetBenchmarkName());
       }
 #endif
-      
+
       runner.DoOneRepetition();
       if (runner.HasRepeatsRemaining()) {
         continue;

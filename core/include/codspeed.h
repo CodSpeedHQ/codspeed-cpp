@@ -34,11 +34,10 @@ class CodSpeed {
 struct RawWalltimeBenchmark {
   std::string name;
   std::string uri;
-  uint64_t iter_per_round;
-  double mean_ns;
-  double median_ns;
-  double stdev_ns;
-  std::vector<double> round_times_ns;
+  // Number of iterations of each round
+  std::vector<uint64_t> iters_per_round;
+  // Time taken by each round, meaning all its iterations, in nanoseconds
+  std::vector<double> times_per_round_ns;
 };
 
 void generate_codspeed_walltime_report(
