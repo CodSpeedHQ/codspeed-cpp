@@ -116,7 +116,7 @@ jobs:
           # Share repository cache between workflows.
           repository-cache: true
 
-      - name: Build and run benchmarks
+      - name: Build benchmark example
         run: |
           bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }} --//core:strict_warnings=on
   
