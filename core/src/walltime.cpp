@@ -1,3 +1,5 @@
+#include "walltime.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -19,44 +21,6 @@
 #include <vector>
 
 namespace codspeed {
-
-// Times are per iteration
-struct BenchmarkStats {
-  double min_ns;
-  double max_ns;
-  double mean_ns;
-  double stdev_ns;
-  double q1_ns;
-  double median_ns;
-  double q3_ns;
-  uint64_t rounds;
-  double total_time;
-  uint64_t iqr_outlier_rounds;
-  uint64_t stdev_outlier_rounds;
-  uint64_t iter_per_round;
-  uint64_t warmup_iters;
-
-  BenchmarkStats(double min_ns = 0.0, double max_ns = 0.0, double mean_ns = 0.0,
-                 double stdev_ns = 0.0, double q1_ns = 0.0,
-                 double median_ns = 0.0, double q3_ns = 0.0,
-                 uint64_t rounds = 0, double total_time = 0.0,
-                 uint64_t iqr_outlier_rounds = 0,
-                 uint64_t stdev_outlier_rounds = 0, uint64_t iter_per_round = 0,
-                 uint64_t warmup_iters = 0)
-      : min_ns(min_ns),
-        max_ns(max_ns),
-        mean_ns(mean_ns),
-        stdev_ns(stdev_ns),
-        q1_ns(q1_ns),
-        median_ns(median_ns),
-        q3_ns(q3_ns),
-        rounds(rounds),
-        total_time(total_time),
-        iqr_outlier_rounds(iqr_outlier_rounds),
-        stdev_outlier_rounds(stdev_outlier_rounds),
-        iter_per_round(iter_per_round),
-        warmup_iters(warmup_iters) {}
-};
 
 struct BenchmarkMetadata {
   std::string name;
@@ -190,85 +154,90 @@ static void write_codspeed_benchmarks_to_json(
   }
 }
 
+BenchmarkStats compute_benchmark_stats(
+    const RawWalltimeBenchmark &raw_benchmark) {
+  assert(raw_benchmark.iters_per_round.size() ==
+         raw_benchmark.times_per_round_ns.size());
+
+  assert(raw_benchmark.iters_per_round.size() != 0);
+
+  // Convert total round times to per-iteration times
+  std::vector<double> per_iteration_times_ns;
+  for (size_t i = 0; i < raw_benchmark.times_per_round_ns.size(); i++) {
+    assert(raw_benchmark.iters_per_round[i] != 0);
+    double per_iter_time_ns =
+        raw_benchmark.times_per_round_ns[i] / raw_benchmark.iters_per_round[i];
+    per_iteration_times_ns.push_back(per_iter_time_ns);
+  }
+
+  // Sort for quantile computation
+  std::vector<double> sorted_per_iter_times_ns = per_iteration_times_ns;
+  std::sort(sorted_per_iter_times_ns.begin(), sorted_per_iter_times_ns.end());
+
+  // Compute statistics from per-iteration times
+  double mean_ns = std::accumulate(per_iteration_times_ns.begin(),
+                                   per_iteration_times_ns.end(), 0.0) /
+                   per_iteration_times_ns.size();
+
+  double variance = 0.0;
+  for (double time_ns : per_iteration_times_ns) {
+    double diff = time_ns - mean_ns;
+    variance += diff * diff;
+  }
+  double stdev_ns = std::sqrt(variance / per_iteration_times_ns.size());
+  const double STDEV_OUTLIER_FACTOR = 3.0;
+  size_t stdev_outlier_rounds = std::count_if(
+      sorted_per_iter_times_ns.begin(), sorted_per_iter_times_ns.end(),
+      [mean_ns, stdev_ns, STDEV_OUTLIER_FACTOR](double x) {
+        return x < mean_ns - STDEV_OUTLIER_FACTOR * stdev_ns ||
+               x > mean_ns + STDEV_OUTLIER_FACTOR * stdev_ns;
+      });
+
+  double q1_ns = compute_quantile(sorted_per_iter_times_ns, 0.25);
+  double median_ns = compute_quantile(sorted_per_iter_times_ns, 0.5);
+  double q3_ns = compute_quantile(sorted_per_iter_times_ns, 0.75);
+
+  double iqr_ns = q3_ns - q1_ns;
+  const double IQR_OUTLIER_FACTOR = 1.5;
+  size_t iqr_outlier_rounds = std::count_if(
+      sorted_per_iter_times_ns.begin(), sorted_per_iter_times_ns.end(),
+      [q1_ns, q3_ns, iqr_ns, IQR_OUTLIER_FACTOR](double x) {
+        return x < q1_ns - IQR_OUTLIER_FACTOR * iqr_ns ||
+               x > q3_ns + IQR_OUTLIER_FACTOR * iqr_ns;
+      });
+
+  // Compute total time in seconds
+  double total_time =
+      std::accumulate(raw_benchmark.times_per_round_ns.begin(),
+                      raw_benchmark.times_per_round_ns.end(), 0.0) /
+      1e9;
+
+  // TODO: CodSpeed format only supports one iter_per_round for all rounds,
+  // for now take the average
+  uint64_t avg_iters_per_round =
+      std::accumulate(raw_benchmark.iters_per_round.begin(),
+                      raw_benchmark.iters_per_round.end(), 0ULL) /
+      raw_benchmark.iters_per_round.size();
+
+  // Populate stats
+  return BenchmarkStats(*std::min_element(sorted_per_iter_times_ns.begin(),
+                                          sorted_per_iter_times_ns.end()),
+                        *std::max_element(sorted_per_iter_times_ns.begin(),
+                                          sorted_per_iter_times_ns.end()),
+                        mean_ns, stdev_ns, q1_ns, median_ns, q3_ns,
+                        raw_benchmark.times_per_round_ns.size(), total_time,
+                        iqr_outlier_rounds, stdev_outlier_rounds,
+                        avg_iters_per_round,
+                        0  // TODO: warmup_iters
+  );
+}
+
 void generate_codspeed_walltime_report(
     const std::vector<RawWalltimeBenchmark> &raw_walltime_benchmarks) {
   std::vector<CodspeedWalltimeBenchmark> codspeed_walltime_benchmarks;
 
   for (const auto &raw_benchmark : raw_walltime_benchmarks) {
-    assert(raw_benchmark.iters_per_round.size() ==
-           raw_benchmark.times_per_round_ns.size());
-
-    assert(raw_benchmark.iters_per_round.size() != 0);
-
-    // Convert total round times to per-iteration times
-    std::vector<double> per_iteration_times_ns;
-    for (size_t i = 0; i < raw_benchmark.times_per_round_ns.size(); i++) {
-      assert(raw_benchmark.iters_per_round[i] != 0);
-      double per_iter_time_ns = raw_benchmark.times_per_round_ns[i] /
-                                raw_benchmark.iters_per_round[i];
-      per_iteration_times_ns.push_back(per_iter_time_ns);
-    }
-
-    // Sort for quantile computation
-    std::vector<double> sorted_per_iter_times_ns = per_iteration_times_ns;
-    std::sort(sorted_per_iter_times_ns.begin(), sorted_per_iter_times_ns.end());
-
-    // Compute statistics from per-iteration times
-    double mean_ns = std::accumulate(per_iteration_times_ns.begin(),
-                                     per_iteration_times_ns.end(), 0.0) /
-                     per_iteration_times_ns.size();
-
-    double variance = 0.0;
-    for (double time_ns : per_iteration_times_ns) {
-      double diff = time_ns - mean_ns;
-      variance += diff * diff;
-    }
-    double stdev_ns = std::sqrt(variance / per_iteration_times_ns.size());
-    const double STDEV_OUTLIER_FACTOR = 3.0;
-    size_t stdev_outlier_rounds = std::count_if(
-        sorted_per_iter_times_ns.begin(), sorted_per_iter_times_ns.end(),
-        [mean_ns, stdev_ns, STDEV_OUTLIER_FACTOR](double x) {
-          return x < mean_ns - STDEV_OUTLIER_FACTOR * stdev_ns ||
-                 x > mean_ns + STDEV_OUTLIER_FACTOR * stdev_ns;
-        });
-
-    double q1_ns = compute_quantile(sorted_per_iter_times_ns, 0.25);
-    double median_ns = compute_quantile(sorted_per_iter_times_ns, 0.5);
-    double q3_ns = compute_quantile(sorted_per_iter_times_ns, 0.75);
-
-    double iqr_ns = q3_ns - q1_ns;
-    const double IQR_OUTLIER_FACTOR = 1.5;
-    size_t iqr_outlier_rounds = std::count_if(
-        sorted_per_iter_times_ns.begin(), sorted_per_iter_times_ns.end(),
-        [q1_ns, q3_ns, iqr_ns, IQR_OUTLIER_FACTOR](double x) {
-          return x < q1_ns - IQR_OUTLIER_FACTOR * iqr_ns ||
-                 x > q3_ns + IQR_OUTLIER_FACTOR * iqr_ns;
-        });
-
-    // Compute total time in seconds
-    double total_time =
-        std::accumulate(raw_benchmark.times_per_round_ns.begin(),
-                        raw_benchmark.times_per_round_ns.end(), 0.0) /
-        1e9;
-
-    // TODO: CodSpeed format only supports one iter_per_round for all rounds,
-    // for now take the average
-    uint64_t avg_iters_per_round =
-        std::accumulate(raw_benchmark.iters_per_round.begin(),
-                        raw_benchmark.iters_per_round.end(), 0ULL) /
-        raw_benchmark.iters_per_round.size();
-
-    // Populate stats
-    BenchmarkStats stats(*std::min_element(sorted_per_iter_times_ns.begin(),
-                                           sorted_per_iter_times_ns.end()),
-                         *std::max_element(sorted_per_iter_times_ns.begin(),
-                                           sorted_per_iter_times_ns.end()),
-                         mean_ns, stdev_ns, q1_ns, median_ns, q3_ns,
-                         raw_benchmark.times_per_round_ns.size(), total_time,
-                         iqr_outlier_rounds, stdev_outlier_rounds,
-                         avg_iters_per_round,
-                         0  // TODO: warmup_iters
-    );
+    BenchmarkStats stats = compute_benchmark_stats(raw_benchmark);
     CodspeedWalltimeBenchmark codspeed_benchmark;
     codspeed_benchmark.metadata = {raw_benchmark.name, raw_benchmark.uri};
     codspeed_benchmark.stats = stats;
