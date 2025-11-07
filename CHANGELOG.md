@@ -5,6 +5,22 @@
 
 
 
+## [1.4.1] - 2025-11-07
+
+### <!-- 0 -->🚀 Features
+- Add unit tests for statistics computation
+- Increase default codspeed walltime repetitions
+- Add support for setting a custom benchmark name
+
+### <!-- 1 -->🐛 Bug Fixes
+- Fix walltime stats computation to handle total round time as an input
+- Use seconds instead of nanoseconds for total_time
+- Dont sample warmup with perf
+
+### <!-- 7 -->⚙️ Internals
+- Fix incorrect step name in bazel integration test
+
+
 ## [1.4.0] - 2025-10-22
 
 ### <!-- 0 -->🚀 Features
@@ -152,6 +168,7 @@
 - Import google benchmark "fork"
 
 
+[1.4.1]: https://github.com/CodSpeedHQ/runner/compare/v1.4.0..v1.4.1
 [1.4.0]: https://github.com/CodSpeedHQ/runner/compare/v1.3.0..v1.4.0
 [1.3.0]: https://github.com/CodSpeedHQ/runner/compare/v1.2.0..v1.3.0
 [1.2.0]: https://github.com/CodSpeedHQ/runner/compare/v1.1.1..v1.2.0
