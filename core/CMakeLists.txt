@@ -143,7 +143,7 @@ target_compile_definitions(
 
 message(STATUS "Using codspeed root directory: ${CODSPEED_ROOT_DIR}")
 
-set(CODSPEED_MODE_ALLOWED_VALUES "off" "instrumentation" "walltime")
+set(CODSPEED_MODE_ALLOWED_VALUES "off" "instrumentation" "simulation" "walltime")
 set(CODSPEED_MODE "off" CACHE STRING "Build mode for Codspeed")
 set_property(
     CACHE CODSPEED_MODE
@@ -166,10 +166,10 @@ if(NOT CODSPEED_MODE STREQUAL "off")
     endif()
 
     # Define a preprocessor macro based on the build mode
-    if(CODSPEED_MODE STREQUAL "instrumentation")
+    if(CODSPEED_MODE STREQUAL "instrumentation" OR CODSPEED_MODE STREQUAL "simulation")
         target_compile_definitions(
             codspeed
-            PUBLIC -DCODSPEED_INSTRUMENTATION
+            PUBLIC -DCODSPEED_SIMULATION
         )
     elseif(CODSPEED_MODE STREQUAL "walltime")
         target_compile_definitions(codspeed PUBLIC -DCODSPEED_WALLTIME)

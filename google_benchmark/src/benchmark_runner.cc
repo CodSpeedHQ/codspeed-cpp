@@ -461,14 +461,14 @@ void BenchmarkRunner::RunProfilerManager(IterationCount profile_iterations) {
 }
 
 void BenchmarkRunner::DoOneRepetition() {
-#ifdef CODSPEED_INSTRUMENTATION
+#ifdef CODSPEED_SIMULATION
   std::unique_ptr<internal::ThreadManager> manager;
   manager.reset(new internal::ThreadManager(b.threads()));
   internal::ThreadTimer timer = internal::ThreadTimer::Create();
   b.Setup();
   measurement_start();
-  State st = b.RunInstrumented(codspeed::CodSpeed::getInstance(), &timer,
-                               manager.get(), nullptr, nullptr);
+  State st = b.RunSimulation(codspeed::CodSpeed::getInstance(), &timer,
+                             manager.get(), nullptr, nullptr);
   measurement_stop();
   b.Teardown();
 
