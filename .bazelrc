@@ -1,4 +1,4 @@
-build --//core:codspeed_mode=instrumentation
+build --@codspeed_core//:codspeed_mode=simulation
 build --compilation_mode=dbg
 build --copt=-O2
 

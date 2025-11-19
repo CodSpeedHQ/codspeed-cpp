@@ -118,14 +118,14 @@ jobs:
 
       - name: Build benchmark example
         run: |
-          bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }} --//core:strict_warnings=on
+          bazel build //examples/google_benchmark_bazel:my_benchmark --@codspeed_core//:codspeed_mode=${{ matrix.codspeed-mode }} --@codspeed_core//:strict_warnings=on
   
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         if: matrix.codspeed-mode != 'off'
         with:
           mode: ${{ matrix.codspeed-mode }}
-          run: bazel run //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }} --//core:strict_warnings=on
+          run: bazel run //examples/google_benchmark_bazel:my_benchmark --@codspeed_core//:codspeed_mode=${{ matrix.codspeed-mode }} --@codspeed_core//:strict_warnings=on
           token: ${{ secrets.CODSPEED_TOKEN }}
 
   cmake-build:
@@ -193,4 +193,4 @@ jobs:
 
       - name: Build benchmark example
         run: |
-          bazel build //examples/google_benchmark_bazel:my_benchmark --//core:codspeed_mode=${{ matrix.codspeed-mode }} --//core:strict_warnings=on
+          bazel build //examples/google_benchmark_bazel:my_benchmark --@codspeed_core//:codspeed_mode=${{ matrix.codspeed-mode }} --@codspeed_core//:strict_warnings=on

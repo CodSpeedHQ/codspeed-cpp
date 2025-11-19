@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-CODSPEED_VERSION = "1.2.0"
+CODSPEED_VERSION = module_version()
 
 config_setting(
     name = "windows",

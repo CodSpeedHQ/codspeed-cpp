@@ -13,6 +13,6 @@ cc_binary(
         "//conditions:default": ["-Wall", "-Wextra", "-Werror"],
     }),
     deps = [
-        "//google_benchmark:benchmark",
+        "@codspeed_google_benchmark_compat//:benchmark"
     ],
 )

@@ -1,10 +1,20 @@
+# This MODULE.bazel is for local development in the monorepo.
+# Individual modules have their own MODULE.bazel files.
+
 bazel_dep(name = "rules_cc", version = "0.0.17")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "platforms", version = "0.0.10")
-bazel_dep(name = "instrument_hooks", version = "1.0.0")
 
-git_override(
-    module_name = "instrument_hooks",
-    commit = "42ed74076c697c2f06c5ac81a84ccee983d7f140",
-    remote = "https://github.com/CodSpeedHQ/instrument-hooks",
+# Local path overrides for development - these point to the subdirectories
+# When published to BCR, users will get the published versions instead
+bazel_dep(name = "codspeed_core")
+local_path_override(
+    module_name = "codspeed_core",
+    path = "core",
+)
+
+bazel_dep(name = "codspeed_google_benchmark_compat")
+local_path_override(
+    module_name = "codspeed_google_benchmark_compat",
+    path = "google_benchmark",
 )
