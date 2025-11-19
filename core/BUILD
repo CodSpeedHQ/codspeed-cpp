@@ -76,7 +76,7 @@ cc_library(
     includes = ["include"],
     copts = select({
         ":windows": ["/std:c++17"],
-        "//conditions:default": [],
+        "//conditions:default": ["-std=c++17"],
     }),
     defines = [
         "CODSPEED_VERSION=\\\"{}\\\"".format(CODSPEED_VERSION),
