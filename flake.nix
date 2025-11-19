@@ -21,6 +21,7 @@
         commonBuildInputs = with pkgs; [
           gcc
           pkg-config
+          git-cliff
 
           # Build systems
           cmake
