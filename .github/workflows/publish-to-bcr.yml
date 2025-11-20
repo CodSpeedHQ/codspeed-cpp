@@ -1,0 +1,25 @@
+name: Publish to Bazel Central Registry
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag to publish (e.g., v1.4.0)'
+        required: true
+        type: string
+
+jobs:
+  publish-to-bcr:
+    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@v1.0.0
+    with:
+      tag_name: ${{ github.event.release.tag_name || inputs.tag_name }}
+      registry_fork: CodSpeedHQ/bazel-central-registry
+      # TODO: Change this back to bazel-central-registry when initial submission has been approved
+      registry: CodSpeedHQ/bazel-central-registry
+      # If we need this, because it requries tweaking permissions on the BCR_PUBLISH_TOKEN secret
+      # Currently it only has access to the bazel-central-registry repo
+      attest: false
+    secrets:
+      publish_token: ${{ secrets.BCR_PUBLISH_TOKEN }}

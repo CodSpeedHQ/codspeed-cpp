@@ -1,0 +1,5 @@
+{
+  "url": "https://github.com/{OWNER}/{REPO}/releases/download/{TAG}/codspeed-cpp-{TAG}.tar.gz",
+  "integrity": "{INTEGRITY}",
+  "strip_prefix": "codspeed-cpp-{TAG}/google_benchmark"
+}

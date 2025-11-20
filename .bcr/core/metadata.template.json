@@ -1,0 +1,15 @@
+{
+  "homepage": "https://codspeed.io",
+  "maintainers": [
+    {
+      "name": "Arthur Pastel",
+      "email": "arthur@codspeed.io",
+      "github": "art049"
+    }
+  ],
+  "repository": [
+    "github:CodSpeedHQ/codspeed-cpp"
+  ],
+  "versions": [],
+  "yanked_versions": {}
+}
