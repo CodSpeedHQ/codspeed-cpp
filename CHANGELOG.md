@@ -5,6 +5,19 @@
 
 
 
+## [2.0.0] - 2025-11-21
+
+### <!-- 0 -->🚀 Features
+- Add support for automated BCR publication
+- Update release process to add full tarball and bump versions
+- Prepare repository for BCR release
+- Accept rename instrumentation to simulation
+
+### <!-- 7 -->⚙️ Internals
+- Make release script work on macos
+- Use c++17 to build core library
+
+
 ## [1.4.1] - 2025-11-07
 
 ### <!-- 0 -->🚀 Features
@@ -168,6 +181,7 @@
 - Import google benchmark "fork"
 
 
+[2.0.0]: https://github.com/CodSpeedHQ/runner/compare/v1.4.1..v2.0.0
 [1.4.1]: https://github.com/CodSpeedHQ/runner/compare/v1.4.0..v1.4.1
 [1.4.0]: https://github.com/CodSpeedHQ/runner/compare/v1.3.0..v1.4.0
 [1.3.0]: https://github.com/CodSpeedHQ/runner/compare/v1.2.0..v1.3.0
