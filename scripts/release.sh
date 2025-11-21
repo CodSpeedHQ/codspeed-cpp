@@ -45,7 +45,12 @@ echo "Updating version numbers in source files..."
 
 for entry in "${VERSION_FILES[@]}"; do
     IFS=':' read -r file line_num <<< "$entry"
-    sed -i "${line_num}s/${PREVIOUS_VERSION}/${VERSION_NO_V}/" "$file"
+    # Use sed in a cross-platform way (macOS requires empty string after -i)
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "${line_num}s/${PREVIOUS_VERSION}/${VERSION_NO_V}/" "$file"
+    else
+        sed -i "${line_num}s/${PREVIOUS_VERSION}/${VERSION_NO_V}/" "$file"
+    fi
     echo "  Updated $file:$line_num"
 done
 
