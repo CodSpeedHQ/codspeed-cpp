@@ -466,10 +466,8 @@ void BenchmarkRunner::DoOneRepetition() {
   manager.reset(new internal::ThreadManager(b.threads()));
   internal::ThreadTimer timer = internal::ThreadTimer::Create();
   b.Setup();
-  measurement_start();
   State st = b.RunSimulation(codspeed::CodSpeed::getInstance(), &timer,
                              manager.get(), nullptr, nullptr);
-  measurement_stop();
   b.Teardown();
 
   return;
