@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "benchmark/benchmark.h"
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
 #include "codspeed.h"
 #endif
 #include "commandlineflags.h"
@@ -38,7 +38,7 @@ class BenchmarkInstance {
   BigOFunc* complexity_lambda() const { return complexity_lambda_; }
   const std::vector<Statistics>& statistics() const { return statistics_; }
   int repetitions() const {
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
     (void)repetitions_;
     return 1;
 #else
@@ -57,7 +57,7 @@ class BenchmarkInstance {
             internal::PerfCountersMeasurement* perf_counters_measurement,
             ProfilerManager* profiler_manager) const;
 
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
   State RunSimulation(
       codspeed::CodSpeed* codspeed, internal::ThreadTimer* timer,
       internal::ThreadManager* manager,

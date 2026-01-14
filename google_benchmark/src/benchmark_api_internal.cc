@@ -91,7 +91,7 @@ BenchmarkInstance::BenchmarkInstance(Benchmark* benchmark, int family_idx,
   teardown_ = benchmark_.teardown_;
 }
 
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
 State BenchmarkInstance::RunSimulation(
     codspeed::CodSpeed* codspeed, internal::ThreadTimer* timer,
     internal::ThreadManager* manager,

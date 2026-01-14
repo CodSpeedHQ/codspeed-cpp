@@ -461,7 +461,7 @@ void BenchmarkRunner::RunProfilerManager(IterationCount profile_iterations) {
 }
 
 void BenchmarkRunner::DoOneRepetition() {
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
   std::unique_ptr<internal::ThreadManager> manager;
   manager.reset(new internal::ThreadManager(b.threads()));
   internal::ThreadTimer timer = internal::ThreadTimer::Create();
