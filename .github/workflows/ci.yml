@@ -56,6 +56,8 @@ jobs:
         include:
           - codspeed-mode: "instrumentation"
             runner: "ubuntu-latest"
+          - codspeed-mode: "memory"
+            runner: "ubuntu-latest"
           - codspeed-mode: "walltime"
             runner: "codspeed-macro"
           - codspeed-mode: "off"
@@ -95,6 +97,8 @@ jobs:
       matrix:
         include:
           - codspeed-mode: "instrumentation"
+            runner: "ubuntu-latest"
+          - codspeed-mode: "memory"
             runner: "ubuntu-latest"
           - codspeed-mode: "walltime"
             runner: "codspeed-macro"
