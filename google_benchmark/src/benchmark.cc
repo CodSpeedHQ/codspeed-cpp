@@ -186,7 +186,7 @@ State::State(std::string name, IterationCount max_iters,
              internal::ThreadTimer* timer, internal::ThreadManager* manager,
              internal::PerfCountersMeasurement* perf_counters_measurement,
              ProfilerManager* profiler_manager
-#if defined(CODSPEED_SIMULATION) || defined(CODSPEED_WALLTIME)
+#if defined(CODSPEED_ANALYSIS) || defined(CODSPEED_WALLTIME)
              ,
              codspeed::CodSpeed* codspeed
 #endif
@@ -196,7 +196,7 @@ State::State(std::string name, IterationCount max_iters,
     : total_iterations_(0),
       batch_leftover_(0),
       max_iterations(max_iters),
-#if defined(CODSPEED_SIMULATION) || defined(CODSPEED_WALLTIME)
+#if defined(CODSPEED_ANALYSIS) || defined(CODSPEED_WALLTIME)
       codspeed_(codspeed),
 #endif
 #ifdef CODSPEED_WALLTIME
@@ -465,7 +465,7 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
 #ifdef CODSPEED_ENABLED
   auto& Err = display_reporter->GetErrorStream();
   // Determine the width of the name field using a minimum width of 10.
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
   Err << "Codspeed mode: simulation" << "\n";
 #elif defined(CODSPEED_WALLTIME)
   Err << "Codspeed mode: walltime" << "\n";

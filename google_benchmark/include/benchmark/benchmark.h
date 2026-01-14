@@ -946,7 +946,7 @@ class BENCHMARK_EXPORT BENCHMARK_INTERNAL_CACHELINE_ALIGNED State {
 
  public:
   const IterationCount max_iterations;
-#if defined(CODSPEED_SIMULATION) || defined(CODSPEED_WALLTIME)
+#if defined(CODSPEED_ANALYSIS) || defined(CODSPEED_WALLTIME)
   codspeed::CodSpeed* codspeed_;
 #endif
 #ifdef CODSPEED_WALLTIME
@@ -974,7 +974,7 @@ class BENCHMARK_EXPORT BENCHMARK_INTERNAL_CACHELINE_ALIGNED State {
         internal::ThreadTimer* timer, internal::ThreadManager* manager,
         internal::PerfCountersMeasurement* perf_counters_measurement,
         ProfilerManager* profiler_manager
-#if defined(CODSPEED_SIMULATION) || defined(CODSPEED_WALLTIME)
+#if defined(CODSPEED_ANALYSIS) || defined(CODSPEED_WALLTIME)
         ,
         codspeed::CodSpeed* codspeed = NULL
 #endif
@@ -1074,12 +1074,12 @@ struct State::StateIterator {
     if (BENCHMARK_BUILTIN_EXPECT(cached_ != 0, true)) {
       return true;
     }
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
     measurement_stop();
 #endif
     parent_->FinishKeepRunning();
 
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
     if (parent_->codspeed_ != NULL) {
       parent_->codspeed_->end_benchmark();
     }
@@ -1096,14 +1096,14 @@ inline BENCHMARK_ALWAYS_INLINE State::StateIterator State::begin() {
   return StateIterator(this);
 }
 inline BENCHMARK_ALWAYS_INLINE State::StateIterator State::end() {
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
   if (this->codspeed_ != NULL) {
     this->codspeed_->start_benchmark(name_);
   }
 #endif
 
   StartKeepRunning();
-#ifdef CODSPEED_SIMULATION
+#ifdef CODSPEED_ANALYSIS
   measurement_start();
 #endif
   return StateIterator();

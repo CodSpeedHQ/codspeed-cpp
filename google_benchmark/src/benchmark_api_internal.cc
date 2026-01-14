@@ -91,8 +91,8 @@ BenchmarkInstance::BenchmarkInstance(Benchmark* benchmark, int family_idx,
   teardown_ = benchmark_.teardown_;
 }
 
-#ifdef CODSPEED_SIMULATION
-State BenchmarkInstance::RunSimulation(
+#ifdef CODSPEED_ANALYSIS
+State BenchmarkInstance::RunAnalysis(
     codspeed::CodSpeed* codspeed, internal::ThreadTimer* timer,
     internal::ThreadManager* manager,
     internal::PerfCountersMeasurement* perf_counters_measurement,
@@ -103,7 +103,7 @@ State BenchmarkInstance::RunSimulation(
   internal::ThreadTimer warmup_timer = internal::ThreadTimer::Create();
   State warmup_state(name_.function_name, 1, args_, 0, 1, &warmup_timer,
                      manager, perf_counters_measurement, profiler_manager,
-                     NULL);
+                     NULL, /*is_warmup=*/true );
   benchmark_.Run(warmup_state);
 
   State st(name().str(), 1, args_, 0, 1, timer, manager,
@@ -119,7 +119,7 @@ State BenchmarkInstance::__codspeed_root_frame__Run(
     internal::ThreadManager* manager,
     internal::PerfCountersMeasurement* perf_counters_measurement,
     ProfilerManager* profiler_manager, bool is_warmup) const {
-#if defined(CODSPEED_SIMULATION) || defined(CODSPEED_WALLTIME)
+#if defined(CODSPEED_ANALYSIS) || defined(CODSPEED_WALLTIME)
   State st(name_.function_name, iters, args_, thread_id, threads_, timer,
            manager, perf_counters_measurement, profiler_manager, codspeed::CodSpeed::getInstance(), is_warmup);
 #else
