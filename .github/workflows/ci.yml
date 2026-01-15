@@ -54,7 +54,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - codspeed-mode: "instrumentation"
+          - codspeed-mode: "simulation"
             runner: "ubuntu-latest"
           - codspeed-mode: "memory"
             runner: "ubuntu-latest"
@@ -96,7 +96,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - codspeed-mode: "instrumentation"
+          - codspeed-mode: "simulation"
             runner: "ubuntu-latest"
           - codspeed-mode: "memory"
             runner: "ubuntu-latest"
