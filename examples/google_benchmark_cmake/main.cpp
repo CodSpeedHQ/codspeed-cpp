@@ -4,6 +4,7 @@
 
 #include "fibonacci_bench.hpp"
 #include "fixture_bench.hpp"
+#include "memory_bench.hpp"
 #include "multithread_bench.hpp"
 #include "pause_timing_bench.hpp"
 #include "sleep_bench.hpp"

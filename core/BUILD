@@ -81,8 +81,9 @@ cc_library(
     defines = [
         "CODSPEED_VERSION=\\\"{}\\\"".format(CODSPEED_VERSION),
     ] + select({
-        ":instrumentation_mode": ["CODSPEED_ENABLED", "CODSPEED_SIMULATION"],
-        ":simulation_mode": ["CODSPEED_ENABLED", "CODSPEED_SIMULATION"],
+        ":instrumentation_mode": ["CODSPEED_ENABLED", "CODSPEED_ANALYSIS"],
+        ":simulation_mode": ["CODSPEED_ENABLED", "CODSPEED_ANALYSIS"],
+        ":memory_mode": ["CODSPEED_ENABLED", "CODSPEED_ANALYSIS"],
         ":walltime_mode": ["CODSPEED_ENABLED", "CODSPEED_WALLTIME"],
         "//conditions:default": [],
     }),
@@ -98,6 +99,7 @@ string_flag(
         "off",
         "instrumentation",
         "simulation",
+        "memory",
         "walltime",
     ],
     visibility = ["//visibility:public"],
@@ -111,6 +113,11 @@ config_setting(
 config_setting(
     name = "simulation_mode",
     flag_values = {":codspeed_mode": "simulation"},
+)
+
+config_setting(
+    name = "memory_mode",
+    flag_values = {":codspeed_mode": "memory"},
 )
 
 config_setting(
