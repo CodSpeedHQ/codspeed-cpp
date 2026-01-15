@@ -84,6 +84,12 @@ jobs:
           cmake -DCODSPEED_MODE=${{ matrix.codspeed-mode }} -DCODSPEED_STRICT_WARNINGS=ON ..
           make -j
 
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install the latest memtrack CLI
+        run: |
+          sudo apt-get update && sudo apt-get install -y autopoint bison flex
+          cargo install --git https://github.com/CodSpeedHQ/runner --branch cod-1715-support-non-libc-allocators memtrack
+
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         if: matrix.codspeed-mode != 'off'
@@ -124,6 +130,12 @@ jobs:
         run: |
           bazel build //examples/google_benchmark_bazel:my_benchmark --@codspeed_core//:codspeed_mode=${{ matrix.codspeed-mode }} --@codspeed_core//:strict_warnings=on
   
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install the latest memtrack CLI
+        run: |
+          sudo apt-get update && sudo apt-get install -y autopoint bison flex
+          cargo install --git https://github.com/CodSpeedHQ/runner --branch cod-1715-support-non-libc-allocators memtrack
+
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         if: matrix.codspeed-mode != 'off'
