@@ -956,6 +956,7 @@ class BENCHMARK_EXPORT BENCHMARK_INTERNAL_CACHELINE_ALIGNED State {
  private:
   bool started_;
   bool finished_;
+  bool is_warmup_;
   internal::Skipped skipped_;
 
   // items we don't need on the first cache line
@@ -977,6 +978,8 @@ class BENCHMARK_EXPORT BENCHMARK_INTERNAL_CACHELINE_ALIGNED State {
         ,
         codspeed::CodSpeed* codspeed = NULL
 #endif
+        ,
+        bool is_warmup = false
   );
 
   void StartKeepRunning();

@@ -53,9 +53,9 @@ class BenchmarkInstance {
   void Teardown() const;
 
   State __codspeed_root_frame__Run(IterationCount iters, int thread_id, internal::ThreadTimer* timer,
-            internal::ThreadManager* manager,
-            internal::PerfCountersMeasurement* perf_counters_measurement,
-            ProfilerManager* profiler_manager) const;
+                internal::ThreadManager* manager,
+                internal::PerfCountersMeasurement* perf_counters_measurement,
+                ProfilerManager* profiler_manager, bool is_warmup = false) const;
 
 #ifdef CODSPEED_SIMULATION
   State RunSimulation(

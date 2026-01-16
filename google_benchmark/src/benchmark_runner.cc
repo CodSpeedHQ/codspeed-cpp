@@ -135,14 +135,14 @@ BenchmarkReporter::Run CreateRunReport(
 void RunInThread(const BenchmarkInstance* b, IterationCount iters,
                  int thread_id, ThreadManager* manager,
                  PerfCountersMeasurement* perf_counters_measurement,
-                 ProfilerManager* profiler_manager_) {
+                 ProfilerManager* profiler_manager_, bool is_warmup = false) {
   internal::ThreadTimer timer(
       b->measure_process_cpu_time()
           ? internal::ThreadTimer::CreateProcessCpuTime()
           : internal::ThreadTimer::Create());
 
   State st = b->__codspeed_root_frame__Run(iters, thread_id, &timer, manager,
-                    perf_counters_measurement, profiler_manager_);
+                    perf_counters_measurement, profiler_manager_, is_warmup);
   BM_CHECK(st.skipped() || st.iterations() >= st.max_iterations)
       << "Benchmark returned before State::KeepRunning() returned false!";
   {
@@ -285,7 +285,7 @@ BenchmarkRunner::BenchmarkRunner(
   }
 }
 
-BenchmarkRunner::IterationResults BenchmarkRunner::DoNIterations() {
+BenchmarkRunner::IterationResults BenchmarkRunner::DoNIterations(bool is_warmup) {
   BM_VLOG(2) << "Running " << b.name().str() << " for " << iters << "\n";
 
   std::unique_ptr<internal::ThreadManager> manager;
@@ -295,13 +295,13 @@ BenchmarkRunner::IterationResults BenchmarkRunner::DoNIterations() {
   for (std::size_t ti = 0; ti < pool.size(); ++ti) {
     pool[ti] = std::thread(&RunInThread, &b, iters, static_cast<int>(ti + 1),
                            manager.get(), perf_counters_measurement_ptr,
-                           /*profiler_manager=*/nullptr);
+                           /*profiler_manager=*/nullptr, is_warmup);
   }
   // And run one thread here directly.
   // (If we were asked to run just one thread, we don't create new threads.)
   // Yes, we need to do this here *after* we start the separate threads.
   RunInThread(&b, iters, 0, manager.get(), perf_counters_measurement_ptr,
-              /*profiler_manager=*/nullptr);
+              /*profiler_manager=*/nullptr, is_warmup);
 
   // The main thread has finished. Now let's wait for the other threads.
   manager->WaitForAllThreads();
@@ -405,7 +405,7 @@ void BenchmarkRunner::RunWarmUp() {
 
   for (;;) {
     b.Setup();
-    i_warmup = DoNIterations();
+    i_warmup = DoNIterations(/*is_warmup=*/true);
     b.Teardown();
 
     const bool finish = ShouldReportIterationResults(i_warmup);
@@ -486,12 +486,6 @@ void BenchmarkRunner::DoOneRepetition() {
     RunWarmUp();
   }
 
-  // IMPORTANT: We must not sample the warmup otherwise the flamegraph timings will be incorrect since we
-  // divide by the iteration count.
-#ifdef CODSPEED_WALLTIME
-  measurement_start();
-#endif
-
   IterationResults i;
   // We *may* be gradually increasing the length (iteration count)
   // of the benchmark until we decide the results are significant.
@@ -525,9 +519,6 @@ void BenchmarkRunner::DoOneRepetition() {
            "if we did more iterations than we want to do the next time, "
            "then we should have accepted the current iteration run.");
   }
-#ifdef CODSPEED_WALLTIME
-  measurement_stop();
-#endif
 
   // Produce memory measurements if requested.
   MemoryManager::Result* memory_result = nullptr;
