@@ -190,6 +190,8 @@ State::State(std::string name, IterationCount max_iters,
              ,
              codspeed::CodSpeed* codspeed
 #endif
+             ,
+             bool is_warmup
              )
     : total_iterations_(0),
       batch_leftover_(0),
@@ -202,6 +204,7 @@ State::State(std::string name, IterationCount max_iters,
 #endif
       started_(false),
       finished_(false),
+      is_warmup_(is_warmup),
       skipped_(internal::NotSkipped),
       range_(ranges),
       complexity_n_(0),
@@ -275,7 +278,7 @@ void State::PauseTiming() {
   timer_->StopTimer();
 
 #ifdef CODSPEED_WALLTIME
-  if (resume_timestamp_ != 0) {
+  if (!is_warmup_ && resume_timestamp_ != 0) {
     measurement_add_benchmark_timestamps(resume_timestamp_, pause_timestamp);
     resume_timestamp_ = 0;
   }
@@ -566,8 +569,9 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
 
 #ifdef CODSPEED_WALLTIME
       auto* codspeed = codspeed::CodSpeed::getInstance();
-      if (codspeed != nullptr) {
+      if (codspeed != nullptr && runner.IsFirstRepetition()) {
         codspeed->start_benchmark(runner.GetBenchmarkName());
+        measurement_start();
       }
 #endif
 
@@ -601,6 +605,7 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
 
 #ifdef CODSPEED_WALLTIME
       if (codspeed != nullptr) {
+        measurement_stop();
         codspeed->end_benchmark();
       }
 

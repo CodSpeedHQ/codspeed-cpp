@@ -60,6 +60,10 @@ class BenchmarkRunner {
     return GetNumRepeats() != num_repetitions_done;
   }
 
+  bool IsFirstRepetition() const {
+    return num_repetitions_done == 0;
+  }
+
   void DoOneRepetition();
 
   RunResults&& GetResults();
@@ -104,7 +108,7 @@ class BenchmarkRunner {
     IterationCount iters;
     double seconds;
   };
-  IterationResults DoNIterations();
+  IterationResults DoNIterations(bool is_warmup = false);
 
   MemoryManager::Result* RunMemoryManager(IterationCount memory_iterations);
 
