@@ -152,6 +152,7 @@ set_property(
 
 if(NOT CODSPEED_MODE STREQUAL "off")
     target_compile_definitions(codspeed PUBLIC -DCODSPEED_ENABLED)
+    target_compile_definitions(codspeed PUBLIC -DCODSPEED_MODE_DISPLAY="${CODSPEED_MODE}")
 
     if(NOT CMAKE_BUILD_TYPE)
         message(

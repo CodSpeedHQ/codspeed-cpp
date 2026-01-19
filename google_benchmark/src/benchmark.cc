@@ -464,12 +464,7 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
 
 #ifdef CODSPEED_ENABLED
   auto& Err = display_reporter->GetErrorStream();
-  // Determine the width of the name field using a minimum width of 10.
-#ifdef CODSPEED_ANALYSIS
-  Err << "Codspeed mode: simulation" << "\n";
-#elif defined(CODSPEED_WALLTIME)
-  Err << "Codspeed mode: walltime" << "\n";
-#endif
+  Err << "Codspeed mode: " << CODSPEED_MODE_DISPLAY << "\n";
 #endif  // CODSPEED_ENABLED
 
   bool might_have_aggregates = FLAGS_benchmark_repetitions > 1;

@@ -81,10 +81,10 @@ cc_library(
     defines = [
         "CODSPEED_VERSION=\\\"{}\\\"".format(CODSPEED_VERSION),
     ] + select({
-        ":instrumentation_mode": ["CODSPEED_ENABLED", "CODSPEED_ANALYSIS"],
-        ":simulation_mode": ["CODSPEED_ENABLED", "CODSPEED_ANALYSIS"],
-        ":memory_mode": ["CODSPEED_ENABLED", "CODSPEED_ANALYSIS"],
-        ":walltime_mode": ["CODSPEED_ENABLED", "CODSPEED_WALLTIME"],
+        ":instrumentation_mode": ["CODSPEED_ENABLED", "CODSPEED_ANALYSIS", "CODSPEED_MODE_DISPLAY=\\\"instrumentation\\\""],
+        ":simulation_mode": ["CODSPEED_ENABLED", "CODSPEED_ANALYSIS", "CODSPEED_MODE_DISPLAY=\\\"simulation\\\""],
+        ":memory_mode": ["CODSPEED_ENABLED", "CODSPEED_ANALYSIS", "CODSPEED_MODE_DISPLAY=\\\"memory\\\""],
+        ":walltime_mode": ["CODSPEED_ENABLED", "CODSPEED_WALLTIME", "CODSPEED_MODE_DISPLAY=\\\"walltime\\\""],
         "//conditions:default": [],
     }),
     deps = [":instrument_hooks"],
