@@ -1,6 +1,7 @@
 #include "benchmark_api_internal.h"
 
 #include <cinttypes>
+#include <cstring>
 
 #include "codspeed.h"
 #include "string_util.h"
@@ -100,11 +101,15 @@ State BenchmarkInstance::RunAnalysis(
   // Do one repetition to avoid flakiness due to inconcistencies in CPU cache
   // from execution order
 
-  internal::ThreadTimer warmup_timer = internal::ThreadTimer::Create();
-  State warmup_state(name_.function_name, 1, args_, 0, 1, &warmup_timer,
-                     manager, perf_counters_measurement, profiler_manager,
-                     NULL, /*is_warmup=*/true );
-  benchmark_.Run(warmup_state);
+  // Only run the warmup in simulation mode. Removing this is a breaking change and has
+  // to be properly planned and evaluated.
+  if (strcmp(CODSPEED_MODE_DISPLAY, "memory") != 0) {
+    internal::ThreadTimer warmup_timer = internal::ThreadTimer::Create();
+    State warmup_state(name_.function_name, 1, args_, 0, 1, &warmup_timer,
+                      manager, perf_counters_measurement, profiler_manager,
+                      NULL, /*is_warmup=*/true );
+    benchmark_.Run(warmup_state);
+  }
 
   State st(name().str(), 1, args_, 0, 1, timer, manager,
            perf_counters_measurement, profiler_manager, codspeed);
