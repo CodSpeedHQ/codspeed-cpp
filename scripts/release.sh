@@ -5,6 +5,14 @@ set -e
 VERSION_NO_V=${1} # The version number without the 'v' prefix
 VERSION=v$1 # The version number, prefixed with 'v'
 
+# Validate version format (X.Y.Z or X.Y.Z-alpha where X, Y, Z are integers)
+if [[ ! "$VERSION_NO_V" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-alpha)?$ ]]; then
+    echo "Error: Invalid version format '$VERSION_NO_V'"
+    echo "Usage: $0 <version>"
+    echo "  Version must be in format X.Y.Z or X.Y.Z-alpha (e.g., 1.2.3 or 1.2.3-alpha)"
+    exit 1
+fi
+
 # Check is on main (unless releasing an alpha version)
 if [[ ! "$VERSION_NO_V" =~ -alpha ]]; then
     if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
@@ -55,15 +63,14 @@ for entry in "${VERSION_FILES[@]}"; do
 done
 
 # Commit version changes
-FILES_TO_COMMIT=$(printf "%s\n" "${VERSION_FILES[@]%%:*}" | sort -u | xargs)
-git add $FILES_TO_COMMIT
+printf "%s\n" "${VERSION_FILES[@]%%:*}" | sort -u | xargs git add
 
-git cliff -o CHANGELOG.md --tag $VERSION --github-token $GITHUB_TOKEN
+git cliff -o CHANGELOG.md --tag "$VERSION" --github-token "$GITHUB_TOKEN"
 git add CHANGELOG.md
 git commit -m "chore: Release $VERSION"
-git tag $VERSION -m "Release $VERSION"
+git tag -s "$VERSION" -m "Release $VERSION"
 git push origin main
-git push origin $VERSION
+git push origin "$VERSION"
 
 # Create tarball with submodules included
 git submodule update --init --recursive
@@ -86,9 +93,9 @@ echo "Tarball created at: $TMPDIR/$TARBALL_NAME"
 
 # Create GitHub release with the tarball
 if [[ "$VERSION_NO_V" =~ -alpha ]]; then
-    gh release create $VERSION -t $VERSION --generate-notes --latest=false "$TMPDIR/$TARBALL_NAME"
+    gh release create "$VERSION" -t "$VERSION" --generate-notes --latest=false "$TMPDIR/$TARBALL_NAME"
 else
-    gh release create $VERSION -t $VERSION --generate-notes --latest "$TMPDIR/$TARBALL_NAME"
+    gh release create "$VERSION" -t "$VERSION" --generate-notes --latest "$TMPDIR/$TARBALL_NAME"
 fi
 
 # Cleanup
