@@ -16,8 +16,6 @@ jobs:
     with:
       tag_name: ${{ github.event.release.tag_name || inputs.tag_name }}
       registry_fork: CodSpeedHQ/bazel-central-registry
-      # TODO: Change this back to bazel-central-registry when initial submission has been approved
-      registry: CodSpeedHQ/bazel-central-registry
       # If we need this, because it requries tweaking permissions on the BCR_PUBLISH_TOKEN secret
       # Currently it only has access to the bazel-central-registry repo
       attest: false
