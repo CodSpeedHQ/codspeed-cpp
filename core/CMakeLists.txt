@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(CODSPEED_VERSION 2.0.0)
+set(CODSPEED_VERSION 2.1.0)
 
 project(codspeed VERSION ${CODSPEED_VERSION} LANGUAGES CXX C)
 

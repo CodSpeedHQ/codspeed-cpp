@@ -5,6 +5,27 @@
 
 
 
+## [2.1.0] - 2026-01-21
+
+### <!-- 0 -->🚀 Features
+- Add memory benchmark example
+- Run memory profiling in CI
+- Define shared CODSPEED_MODE_DISPLAY
+- Add support for memory mode
+
+### <!-- 1 -->🐛 Bug Fixes
+- Update release script, ensure correct versions are released
+- Skip warmup in memory mode
+- Exclude warmup measurements
+- Dont start and stop valgrind twice
+
+### <!-- 7 -->⚙️ Internals
+- Use OIDC token
+- Bump instrument-hooks
+- Switch to simulation
+- Bump instrument-hooks to support memory profiling
+
+
 ## [2.0.0] - 2025-11-21
 
 ### <!-- 0 -->🚀 Features
@@ -181,6 +202,7 @@
 - Import google benchmark "fork"
 
 
+[2.1.0]: https://github.com/CodSpeedHQ/runner/compare/v2.0.0..v2.1.0
 [2.0.0]: https://github.com/CodSpeedHQ/runner/compare/v1.4.1..v2.0.0
 [1.4.1]: https://github.com/CodSpeedHQ/runner/compare/v1.4.0..v1.4.1
 [1.4.0]: https://github.com/CodSpeedHQ/runner/compare/v1.3.0..v1.4.0
