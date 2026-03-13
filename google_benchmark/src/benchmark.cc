@@ -19,7 +19,7 @@
 #include "codspeed.h"
 #include "internal_macros.h"
 
-#ifdef CODSPEED_WALLTIME
+#if defined(CODSPEED_WALLTIME) || defined(CODSPEED_ANALYSIS)
 #include "measurement.hpp"
 #endif
 
@@ -272,6 +272,9 @@ void State::PauseTiming() {
 #ifdef CODSPEED_WALLTIME
   uint64_t pause_timestamp = measurement_current_timestamp();
 #endif
+#ifdef CODSPEED_ANALYSIS
+  callgrind_stop_instrumentation();
+#endif
 
   // Add in time accumulated so far
   BM_CHECK(started_ && !finished_ && !skipped());
@@ -309,6 +312,9 @@ void State::ResumeTiming() {
 #ifdef CODSPEED_WALLTIME
   BM_CHECK(resume_timestamp_ == 0);
   resume_timestamp_ = measurement_current_timestamp();
+#endif
+#ifdef CODSPEED_ANALYSIS
+  callgrind_start_instrumentation();
 #endif
 }
 
