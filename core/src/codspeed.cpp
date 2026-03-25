@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 
+#if __has_include("toolchain_info.h")
+#include "toolchain_info.h"
+#endif
+
 #include "measurement.hpp"
 
 namespace codspeed {
