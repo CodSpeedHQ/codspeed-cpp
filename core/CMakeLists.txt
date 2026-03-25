@@ -15,7 +15,7 @@ include(FetchContent)
 FetchContent_Declare(
     instrument_hooks_repo
     GIT_REPOSITORY https://github.com/CodSpeedHQ/instrument-hooks
-    GIT_TAG 89fb72a076ec71c9eca6eee9bca98bada4b4dfb4
+    GIT_TAG e86719c70c9c0b1646db182a7c748230e243dace
 )
 FetchContent_MakeAvailable(instrument_hooks_repo)
 FetchContent_GetProperties(instrument_hooks_repo)
@@ -95,6 +95,25 @@ target_link_libraries(codspeed PRIVATE instrument_hooks)
 
 # Version
 add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
+
+# Collect compiler toolchain information for environment reporting
+execute_process(
+    COMMAND ${CMAKE_CXX_COMPILER} --version
+    OUTPUT_VARIABLE CODSPEED_CXX_COMPILER_FULL_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+# Extract first line only
+if(CODSPEED_CXX_COMPILER_FULL_VERSION)
+    string(REGEX REPLACE "\n.*" "" CODSPEED_CXX_COMPILER_FULL_VERSION "${CODSPEED_CXX_COMPILER_FULL_VERSION}")
+endif()
+
+target_compile_definitions(codspeed PRIVATE
+    CODSPEED_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
+    CODSPEED_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
+    CODSPEED_CXX_COMPILER_FULL_VERSION="${CODSPEED_CXX_COMPILER_FULL_VERSION}"
+    CODSPEED_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+)
 
 # Specify the include directories for users of the library
 target_include_directories(

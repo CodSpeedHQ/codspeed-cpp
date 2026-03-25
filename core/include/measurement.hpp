@@ -35,6 +35,25 @@ inline bool measurement_is_instrumented() {
 inline void measurement_set_metadata() {
   std::string version = get_version();
   instrument_hooks_set_integration(g_hooks, "codspeed-cpp", version.c_str());
+
+  // Report C++ toolchain information
+#ifdef CODSPEED_CXX_COMPILER_ID
+  instrument_hooks_set_environment(g_hooks, "C++ Compiler", "compiler_id",
+                                   CODSPEED_CXX_COMPILER_ID);
+#endif
+#ifdef CODSPEED_CXX_COMPILER_VERSION
+  instrument_hooks_set_environment(g_hooks, "C++ Compiler", "version",
+                                   CODSPEED_CXX_COMPILER_VERSION);
+#endif
+#ifdef CODSPEED_CXX_COMPILER_FULL_VERSION
+  instrument_hooks_set_environment(g_hooks, "C++ Compiler", "build",
+                                   CODSPEED_CXX_COMPILER_FULL_VERSION);
+#endif
+#ifdef CODSPEED_BUILD_TYPE
+  instrument_hooks_set_environment(g_hooks, "C++ Compiler", "build_type",
+                                   CODSPEED_BUILD_TYPE);
+#endif
+  instrument_hooks_write_environment(g_hooks, static_cast<uint32_t>(getpid()));
 }
 
 ALWAYS_INLINE void measurement_start() {
@@ -55,7 +74,7 @@ ALWAYS_INLINE uint64_t measurement_current_timestamp() {
 }
 
 ALWAYS_INLINE uint8_t measurement_add_marker(uint8_t marker_type,
-                                            uint64_t timestamp) {
+                                             uint64_t timestamp) {
   auto pid = static_cast<uint32_t>(getpid());
   return instrument_hooks_add_marker(g_hooks, pid, marker_type, timestamp);
 }
