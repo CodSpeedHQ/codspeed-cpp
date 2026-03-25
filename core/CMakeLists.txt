@@ -96,6 +96,25 @@ target_link_libraries(codspeed PRIVATE instrument_hooks)
 # Version
 add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
 
+# Collect compiler toolchain information for environment reporting
+execute_process(
+    COMMAND ${CMAKE_CXX_COMPILER} --version
+    OUTPUT_VARIABLE CODSPEED_CXX_COMPILER_FULL_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+# Extract first line only
+if(CODSPEED_CXX_COMPILER_FULL_VERSION)
+    string(REGEX REPLACE "\n.*" "" CODSPEED_CXX_COMPILER_FULL_VERSION "${CODSPEED_CXX_COMPILER_FULL_VERSION}")
+endif()
+
+target_compile_definitions(codspeed PRIVATE
+    CODSPEED_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
+    CODSPEED_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
+    CODSPEED_CXX_COMPILER_FULL_VERSION="${CODSPEED_CXX_COMPILER_FULL_VERSION}"
+    CODSPEED_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+)
+
 # Specify the include directories for users of the library
 target_include_directories(
     codspeed
