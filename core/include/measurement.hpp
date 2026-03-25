@@ -54,9 +54,9 @@ ALWAYS_INLINE uint64_t measurement_current_timestamp() {
   return instrument_hooks_current_timestamp();
 }
 
-ALWAYS_INLINE int8_t measurement_add_marker(uint8_t marker_type,
+ALWAYS_INLINE uint8_t measurement_add_marker(uint8_t marker_type,
                                             uint64_t timestamp) {
-  auto pid = getpid();
+  auto pid = static_cast<uint32_t>(getpid());
   return instrument_hooks_add_marker(g_hooks, pid, marker_type, timestamp);
 }
 
