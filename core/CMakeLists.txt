@@ -97,23 +97,20 @@ target_link_libraries(codspeed PRIVATE instrument_hooks)
 add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
 
 # Collect compiler toolchain information for environment reporting
+# Use the shared detect_toolchain.sh script (same as Bazel) for consistent output
 execute_process(
-    COMMAND ${CMAKE_CXX_COMPILER} --version
-    OUTPUT_VARIABLE CODSPEED_CXX_COMPILER_FULL_VERSION
+    COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/scripts/detect_toolchain.sh"
+            "${CMAKE_CXX_COMPILER}" "${CMAKE_BUILD_TYPE}"
+    OUTPUT_VARIABLE CODSPEED_TOOLCHAIN_HEADER
     OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
+    RESULT_VARIABLE DETECT_TOOLCHAIN_RESULT
 )
-# Extract first line only
-if(CODSPEED_CXX_COMPILER_FULL_VERSION)
-    string(REGEX REPLACE "\n.*" "" CODSPEED_CXX_COMPILER_FULL_VERSION "${CODSPEED_CXX_COMPILER_FULL_VERSION}")
+if(DETECT_TOOLCHAIN_RESULT EQUAL 0)
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/toolchain_info.h" "${CODSPEED_TOOLCHAIN_HEADER}\n")
+else()
+    message(WARNING "detect_toolchain.sh failed, toolchain info will not be available")
 endif()
-
-target_compile_definitions(codspeed PRIVATE
-    CODSPEED_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
-    CODSPEED_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
-    CODSPEED_CXX_COMPILER_FULL_VERSION="${CODSPEED_CXX_COMPILER_FULL_VERSION}"
-    CODSPEED_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
-)
+target_include_directories(codspeed PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Specify the include directories for users of the library
 target_include_directories(

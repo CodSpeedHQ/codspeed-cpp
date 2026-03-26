@@ -19,9 +19,16 @@ jobs:
         with:
           extra_args: --all-files
 
+  toolchain-detection-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run toolchain detection tests
+        run: bash core/scripts/test_detect_toolchain.sh
+
   tests:
     runs-on: ubuntu-latest
-    steps: 
+    steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
