@@ -15,7 +15,7 @@ include(FetchContent)
 FetchContent_Declare(
     instrument_hooks_repo
     GIT_REPOSITORY https://github.com/CodSpeedHQ/instrument-hooks
-    GIT_TAG e86719c70c9c0b1646db182a7c748230e243dace
+    GIT_TAG 0c971823b17cb5a3bbd0cce4411cbee2c6fe4317
 )
 FetchContent_MakeAvailable(instrument_hooks_repo)
 FetchContent_GetProperties(instrument_hooks_repo)
