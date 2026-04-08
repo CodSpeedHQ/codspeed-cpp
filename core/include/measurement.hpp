@@ -38,19 +38,19 @@ inline void measurement_set_metadata() {
 
   // Report C++ toolchain information
 #ifdef CODSPEED_CXX_COMPILER_ID
-  instrument_hooks_set_environment(g_hooks, "C++ Compiler", "compiler_id",
+  instrument_hooks_set_environment(g_hooks, "cpp", "compiler_id",
                                    CODSPEED_CXX_COMPILER_ID);
 #endif
 #ifdef CODSPEED_CXX_COMPILER_VERSION
-  instrument_hooks_set_environment(g_hooks, "C++ Compiler", "version",
+  instrument_hooks_set_environment(g_hooks, "cpp", "version",
                                    CODSPEED_CXX_COMPILER_VERSION);
 #endif
 #ifdef CODSPEED_CXX_COMPILER_FULL_VERSION
-  instrument_hooks_set_environment(g_hooks, "C++ Compiler", "build",
+  instrument_hooks_set_environment(g_hooks, "cpp", "build",
                                    CODSPEED_CXX_COMPILER_FULL_VERSION);
 #endif
 #ifdef CODSPEED_BUILD_TYPE
-  instrument_hooks_set_environment(g_hooks, "C++ Compiler", "build_type",
+  instrument_hooks_set_environment(g_hooks, "cpp", "build_type",
                                    CODSPEED_BUILD_TYPE);
 #endif
   instrument_hooks_write_environment(g_hooks, static_cast<uint32_t>(getpid()));
