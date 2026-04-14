@@ -50,7 +50,7 @@ jobs:
           make -j
 
       - name: Run tests
-        run: | 
+        run: |
           cd core/build-tests
           GTEST_OUTPUT=json:test-results/ ctest
 
@@ -133,7 +133,7 @@ jobs:
       - name: Build benchmark example
         run: |
           bazel build //examples/google_benchmark_bazel:my_benchmark --@codspeed_core//:codspeed_mode=${{ matrix.codspeed-mode }} --@codspeed_core//:strict_warnings=on
-  
+
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         if: matrix.codspeed-mode != 'off'
@@ -207,3 +207,59 @@ jobs:
       - name: Build benchmark example
         run: |
           bazel build //examples/google_benchmark_bazel:my_benchmark --@codspeed_core//:codspeed_mode=${{ matrix.codspeed-mode }} --@codspeed_core//:strict_warnings=on
+
+  macos-walltime-cmake-test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Build benchmark example
+        run: |
+          mkdir -p examples/google_benchmark_cmake/build
+          cd examples/google_benchmark_cmake/build
+          cmake -DCODSPEED_MODE=walltime ..
+          make -j
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@main
+        env:
+          CODSPEED_SKIP_UPLOAD: "true"
+        with:
+          run: examples/google_benchmark_cmake/build/benchmark_example --benchmark_filter=Fibo
+          mode: walltime
+          # TODO: Remove this once the runner has been released with macos support
+          runner-version: branch:main
+
+  macos-walltime-bazel-test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Set up Bazel
+        uses: bazel-contrib/setup-bazel@0.14.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+
+      - name: Build benchmark example
+        run: |
+          bazel build //examples/google_benchmark_bazel:my_benchmark --@codspeed_core//:codspeed_mode=walltime --@codspeed_core//:strict_warnings=on
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@main
+        env:
+          CODSPEED_SKIP_UPLOAD: "true"
+        with:
+          # Note: using bazel run directly fails with a permission error on `/var/tmp/_bazel_codspeed/`
+          # This is because bazel does not like the user switch between running `bazel build` as a user then running `bazel run` as sudo and refuses to run.
+          # For now, `$USER` remains the original user, but the program is ran with uid 0 with `sudo --preserve-env`
+          # This problem is temporary because the runner does not YET do the same uid/gid spoofing on macos as it does on linux.
+          run: ./bazel-bin/examples/google_benchmark_bazel/my_benchmark --benchmark_filter=Fibo
+          mode: walltime
+          # TODO: Remove this once the runner has been released with macos support
+          runner-version: branch:main
