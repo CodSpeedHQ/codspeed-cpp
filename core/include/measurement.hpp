@@ -65,7 +65,7 @@ ALWAYS_INLINE void measurement_stop() {
 }
 
 ALWAYS_INLINE void measurement_set_executed_benchmark(const std::string& name) {
-  auto current_pid = getpid();
+  auto current_pid = static_cast<uint32_t>(getpid());
   instrument_hooks_executed_benchmark(g_hooks, current_pid, name.c_str());
 }
 
