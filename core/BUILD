@@ -8,6 +8,11 @@ config_setting(
     constraint_values = ["@platforms//os:windows"],
 )
 
+config_setting(
+    name = "macos",
+    constraint_values = ["@platforms//os:macos"],
+)
+
 # Strict warnings mode
 string_flag(
     name = "strict_warnings",
@@ -100,6 +105,9 @@ cc_library(
     copts = select({
         ":windows": ["/std:c++17"],
         "//conditions:default": ["-std=c++17"],
+    }) + select({
+        ":macos": ["-mmacosx-version-min=10.15"],
+        "//conditions:default": [],
     }),
     defines = [
         "CODSPEED_VERSION=\\\"{}\\\"".format(CODSPEED_VERSION),
