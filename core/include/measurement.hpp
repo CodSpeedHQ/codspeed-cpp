@@ -53,7 +53,7 @@ inline void measurement_set_metadata() {
   instrument_hooks_set_environment(g_hooks, "cpp", "build_type",
                                    CODSPEED_BUILD_TYPE);
 #endif
-  instrument_hooks_write_environment(g_hooks, static_cast<uint32_t>(getpid()));
+  instrument_hooks_write_environment(g_hooks, getpid());
 }
 
 ALWAYS_INLINE void measurement_start() {
@@ -65,7 +65,7 @@ ALWAYS_INLINE void measurement_stop() {
 }
 
 ALWAYS_INLINE void measurement_set_executed_benchmark(const std::string& name) {
-  auto current_pid = static_cast<uint32_t>(getpid());
+  auto current_pid = getpid();
   instrument_hooks_executed_benchmark(g_hooks, current_pid, name.c_str());
 }
 
@@ -75,7 +75,7 @@ ALWAYS_INLINE uint64_t measurement_current_timestamp() {
 
 ALWAYS_INLINE uint8_t measurement_add_marker(uint8_t marker_type,
                                              uint64_t timestamp) {
-  auto pid = static_cast<uint32_t>(getpid());
+  auto pid = getpid();
   return instrument_hooks_add_marker(g_hooks, pid, marker_type, timestamp);
 }
 

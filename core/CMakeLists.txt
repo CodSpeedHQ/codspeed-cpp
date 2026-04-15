@@ -15,7 +15,7 @@ include(FetchContent)
 FetchContent_Declare(
     instrument_hooks_repo
     GIT_REPOSITORY https://github.com/CodSpeedHQ/instrument-hooks
-    GIT_TAG 4376be3e1e2d0e0c82d690bcb8e54bde98b7805c
+    GIT_TAG ecdf31a3afd0fb879823e40df65129ec823d374b
 )
 FetchContent_MakeAvailable(instrument_hooks_repo)
 FetchContent_GetProperties(instrument_hooks_repo)
@@ -25,17 +25,13 @@ endif()
 set(instrument_hooks_SOURCE_DIR ${instrument_hooks_repo_SOURCE_DIR})
 
 # Add the instrument_hooks library
-add_library(
-    instrument_hooks
-    STATIC
-    ${instrument_hooks_SOURCE_DIR}/dist/core.c
-)
+add_library(instrument_hooks STATIC ${instrument_hooks_SOURCE_DIR}/dist/core.c)
 
 target_include_directories(
     instrument_hooks
     PUBLIC
-    $<BUILD_INTERFACE:${instrument_hooks_SOURCE_DIR}/includes>
-    $<INSTALL_INTERFACE:includes>
+        $<BUILD_INTERFACE:${instrument_hooks_SOURCE_DIR}/includes>
+        $<INSTALL_INTERFACE:includes>
 )
 
 # Option to enable strict warnings (for CI builds)
@@ -61,24 +57,19 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         list(PREPEND INSTRUMENT_HOOKS_CFLAGS -Wall -Werror)
     endif()
 
-    target_compile_options(
-        instrument_hooks
-        PRIVATE
-        ${INSTRUMENT_HOOKS_CFLAGS}
-    )
+    target_compile_options(instrument_hooks PRIVATE ${INSTRUMENT_HOOKS_CFLAGS})
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(
         instrument_hooks
         PRIVATE
-        /wd4101  # unreferenced local variable (equivalent to -Wno-unused-variable)
-        /wd4189  # local variable is initialized but not referenced (equivalent to -Wno-unused-but-set-variable)
-        /wd4100  # unreferenced formal parameter (equivalent to -Wno-unused-parameter)
-        /wd4245  # signed/unsigned mismatch
-        /wd4132  # const object should be initialized
-        /wd4146  # unary minus operator applied to unsigned type
+            /wd4101 # unreferenced local variable (equivalent to -Wno-unused-variable)
+            /wd4189 # local variable is initialized but not referenced (equivalent to -Wno-unused-but-set-variable)
+            /wd4100 # unreferenced formal parameter (equivalent to -Wno-unused-parameter)
+            /wd4245 # signed/unsigned mismatch
+            /wd4132 # const object should be initialized
+            /wd4146 # unary minus operator applied to unsigned type
     )
 endif()
-
 
 # Add the main library
 add_library(
@@ -99,24 +90,32 @@ add_compile_definitions(CODSPEED_VERSION="${CODSPEED_VERSION}")
 # Collect compiler toolchain information for environment reporting
 # Use the shared detect_toolchain.sh script (same as Bazel) for consistent output
 execute_process(
-    COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/scripts/detect_toolchain.sh"
-            "${CMAKE_CXX_COMPILER}" "${CMAKE_BUILD_TYPE}"
+    COMMAND
+        bash "${CMAKE_CURRENT_SOURCE_DIR}/scripts/detect_toolchain.sh"
+        "${CMAKE_CXX_COMPILER}" "${CMAKE_BUILD_TYPE}"
     OUTPUT_VARIABLE CODSPEED_TOOLCHAIN_HEADER
     OUTPUT_STRIP_TRAILING_WHITESPACE
     RESULT_VARIABLE DETECT_TOOLCHAIN_RESULT
 )
 if(DETECT_TOOLCHAIN_RESULT EQUAL 0)
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/toolchain_info.h" "${CODSPEED_TOOLCHAIN_HEADER}\n")
+    file(
+        WRITE "${CMAKE_CURRENT_BINARY_DIR}/toolchain_info.h"
+        "${CODSPEED_TOOLCHAIN_HEADER}\n"
+    )
 else()
-    message(WARNING "detect_toolchain.sh failed, toolchain info will not be available")
+    message(
+        WARNING
+        "detect_toolchain.sh failed, toolchain info will not be available"
+    )
 endif()
 target_include_directories(codspeed PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Specify the include directories for users of the library
 target_include_directories(
     codspeed
-    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-           $<BUILD_INTERFACE:${instrument_hooks_SOURCE_DIR}/includes>
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${instrument_hooks_SOURCE_DIR}/includes>
 )
 
 # Disable valgrind compilation errors
@@ -159,7 +158,13 @@ target_compile_definitions(
 
 message(STATUS "Using codspeed root directory: ${CODSPEED_ROOT_DIR}")
 
-set(CODSPEED_MODE_ALLOWED_VALUES "off" "instrumentation" "simulation" "memory" "walltime")
+set(CODSPEED_MODE_ALLOWED_VALUES
+    "off"
+    "instrumentation"
+    "simulation"
+    "memory"
+    "walltime"
+)
 set(CODSPEED_MODE "off" CACHE STRING "Build mode for Codspeed")
 set_property(
     CACHE CODSPEED_MODE
@@ -168,7 +173,10 @@ set_property(
 
 if(NOT CODSPEED_MODE STREQUAL "off")
     target_compile_definitions(codspeed PUBLIC -DCODSPEED_ENABLED)
-    target_compile_definitions(codspeed PUBLIC -DCODSPEED_MODE_DISPLAY="${CODSPEED_MODE}")
+    target_compile_definitions(
+        codspeed
+        PUBLIC -DCODSPEED_MODE_DISPLAY="${CODSPEED_MODE}"
+    )
 
     if(NOT CMAKE_BUILD_TYPE)
         message(
@@ -183,11 +191,12 @@ if(NOT CODSPEED_MODE STREQUAL "off")
     endif()
 
     # Define a preprocessor macro based on the build mode
-    if(CODSPEED_MODE STREQUAL "instrumentation" OR CODSPEED_MODE STREQUAL "simulation" OR CODSPEED_MODE STREQUAL "memory")
-        target_compile_definitions(
-            codspeed
-            PUBLIC -DCODSPEED_ANALYSIS
-        )
+    if(
+        CODSPEED_MODE STREQUAL "instrumentation"
+        OR CODSPEED_MODE STREQUAL "simulation"
+        OR CODSPEED_MODE STREQUAL "memory"
+    )
+        target_compile_definitions(codspeed PUBLIC -DCODSPEED_ANALYSIS)
     elseif(CODSPEED_MODE STREQUAL "walltime")
         target_compile_definitions(codspeed PUBLIC -DCODSPEED_WALLTIME)
     else()
