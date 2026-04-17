@@ -5,6 +5,22 @@
 
 
 
+## [2.2.0] - 2026-04-17
+
+### <!-- 0 -->🚀 Features
+- Add toolchain environment collection to bazel
+- Add toolchain environment collection to CMake build
+
+### <!-- 1 -->🐛 Bug Fixes
+- Use slugged name for environment section
+- Fix clang 19 compilation error
+
+### <!-- 7 -->⚙️ Internals
+- Bump instrument-hooks to collect runtime libraries
+- Use the same logic for toolchain detection
+- Stop targeting our fork for BCR PR (#43)
+
+
 ## [2.1.0] - 2026-01-21
 
 ### <!-- 0 -->🚀 Features
@@ -202,6 +218,7 @@
 - Import google benchmark "fork"
 
 
+[2.2.0]: https://github.com/CodSpeedHQ/runner/compare/v2.1.0..v2.2.0
 [2.1.0]: https://github.com/CodSpeedHQ/runner/compare/v2.0.0..v2.1.0
 [2.0.0]: https://github.com/CodSpeedHQ/runner/compare/v1.4.1..v2.0.0
 [1.4.1]: https://github.com/CodSpeedHQ/runner/compare/v1.4.0..v1.4.1
