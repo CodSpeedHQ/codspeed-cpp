@@ -5,6 +5,19 @@
 
 
 
+## [2.3.0] - 2026-04-28
+
+### <!-- 0 -->🚀 Features
+- Add cmake formatter to precommit hooks
+- Bump instrument-hooks to use int32_t for pid
+- Fix bazel build by forcing C++17
+
+### <!-- 7 -->⚙️ Internals
+- Add macos integration test
+- Explicitly convert pid to unsigned
+- Bump instrument-hooks to suppress stub warnings
+
+
 ## [2.2.0] - 2026-04-17
 
 ### <!-- 0 -->🚀 Features
@@ -218,6 +231,7 @@
 - Import google benchmark "fork"
 
 
+[2.3.0]: https://github.com/CodSpeedHQ/runner/compare/v2.2.0..v2.3.0
 [2.2.0]: https://github.com/CodSpeedHQ/runner/compare/v2.1.0..v2.2.0
 [2.1.0]: https://github.com/CodSpeedHQ/runner/compare/v2.0.0..v2.1.0
 [2.0.0]: https://github.com/CodSpeedHQ/runner/compare/v1.4.1..v2.0.0
