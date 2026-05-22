@@ -16,6 +16,18 @@ static void BM_FibonacciRecursive(benchmark::State& state) {
 }
 BENCHMARK(BM_FibonacciRecursive)->Arg(35)->MinTime(5);
 
+#ifdef __APPLE__
+// TODO(COD-2715): Run all benches on MacOS
+static void BM_FibonacciRecursive_Darwin(benchmark::State& state) {
+  int n = static_cast<int>(state.range(0));
+  for (auto _ : state) {
+    uint64_t result = fibonacci_recursive(n);
+    benchmark::DoNotOptimize(result);
+  }
+}
+BENCHMARK(BM_FibonacciRecursive_Darwin)->Arg(35)->MinTime(5);
+#endif
+
 static uint64_t fibonacci_iterative(int n) {
   if (n <= 1) return n;
 
