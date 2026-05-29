@@ -10,6 +10,7 @@ static uint64_t fibonacci_recursive(int n) {
 static void BM_FibonacciRecursive(benchmark::State& state) {
   int n = static_cast<int>(state.range(0));
   for (auto _ : state) {
+    benchmark::DoNotOptimize(n);
     uint64_t result = fibonacci_recursive(n);
     benchmark::DoNotOptimize(result);
   }
@@ -21,6 +22,7 @@ BENCHMARK(BM_FibonacciRecursive)->Arg(35)->MinTime(5);
 static void BM_FibonacciRecursive_Darwin(benchmark::State& state) {
   int n = static_cast<int>(state.range(0));
   for (auto _ : state) {
+    benchmark::DoNotOptimize(n);
     uint64_t result = fibonacci_recursive(n);
     benchmark::DoNotOptimize(result);
   }
