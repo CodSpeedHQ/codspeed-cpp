@@ -5,6 +5,18 @@
 
 
 
+## [2.4.0] - 2026-06-04
+
+### <!-- 0 -->🚀 Features
+- Add Darwin-specific fib variant for macOS flamegraph coverage
+
+### <!-- 4 -->⚡ Performance
+- Prevent constant-folding of fib input across iterations
+
+### <!-- 7 -->⚙️ Internals
+- Bump instrument-hooks
+
+
 ## [2.3.0] - 2026-04-28
 
 ### <!-- 0 -->🚀 Features
@@ -231,6 +243,7 @@
 - Import google benchmark "fork"
 
 
+[2.4.0]: https://github.com/CodSpeedHQ/runner/compare/v2.3.0..v2.4.0
 [2.3.0]: https://github.com/CodSpeedHQ/runner/compare/v2.2.0..v2.3.0
 [2.2.0]: https://github.com/CodSpeedHQ/runner/compare/v2.1.0..v2.2.0
 [2.1.0]: https://github.com/CodSpeedHQ/runner/compare/v2.0.0..v2.1.0
