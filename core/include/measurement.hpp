@@ -56,6 +56,12 @@ inline void measurement_set_metadata() {
   instrument_hooks_write_environment(g_hooks, getpid());
 }
 
+#ifdef CODSPEED_ANALYSIS
+// inline (C++17) so every translation unit shares one definition; a static
+// would give each TU its own copy and silently desync the toggle parity.
+inline bool measurement_collecting = true;
+#endif
+
 ALWAYS_INLINE void measurement_start() {
   instrument_hooks_start_benchmark_inline(g_hooks);
 }
@@ -87,5 +93,24 @@ ALWAYS_INLINE void measurement_add_benchmark_timestamps(uint64_t start,
   measurement_add_marker(MARKER_TYPE_BENCHMARK_START, start);
   measurement_add_marker(MARKER_TYPE_BENCHMARK_END, end);
 }
+
+#ifdef CODSPEED_ANALYSIS
+ALWAYS_INLINE void measurement_pause_timing() {
+  if (measurement_collecting) {
+    callgrind_toggle_collect();
+    measurement_collecting = false;
+  }
+}
+
+ALWAYS_INLINE void measurement_resume_timing() {
+  if (!measurement_collecting) {
+    callgrind_toggle_collect();
+    measurement_collecting = true;
+  }
+}
+#else
+ALWAYS_INLINE void measurement_pause_timing() {}
+ALWAYS_INLINE void measurement_resume_timing() {}
+#endif
 
 #endif  // MEASUREMENT_H

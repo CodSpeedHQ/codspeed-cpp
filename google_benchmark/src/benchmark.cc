@@ -19,9 +19,7 @@
 #include "codspeed.h"
 #include "internal_macros.h"
 
-#ifdef CODSPEED_WALLTIME
 #include "measurement.hpp"
-#endif
 
 #ifndef BENCHMARK_OS_WINDOWS
 #if !defined(BENCHMARK_OS_FUCHSIA) && !defined(BENCHMARK_OS_QURT)
@@ -272,6 +270,7 @@ void State::PauseTiming() {
 #ifdef CODSPEED_WALLTIME
   uint64_t pause_timestamp = measurement_current_timestamp();
 #endif
+  measurement_pause_timing();
 
   // Add in time accumulated so far
   BM_CHECK(started_ && !finished_ && !skipped());
@@ -310,6 +309,7 @@ void State::ResumeTiming() {
   BM_CHECK(resume_timestamp_ == 0);
   resume_timestamp_ = measurement_current_timestamp();
 #endif
+  measurement_resume_timing();
 }
 
 void State::SkipWithMessage(const std::string& msg) {
@@ -324,6 +324,7 @@ void State::SkipWithMessage(const std::string& msg) {
   total_iterations_ = 0;
   if (timer_->running()) {
     timer_->StopTimer();
+    measurement_pause_timing();
   }
 }
 
@@ -339,6 +340,7 @@ void State::SkipWithError(const std::string& msg) {
   total_iterations_ = 0;
   if (timer_->running()) {
     timer_->StopTimer();
+    measurement_pause_timing();
   }
 }
 
