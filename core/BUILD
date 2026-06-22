@@ -49,6 +49,7 @@ instrument_hooks_cflags = [
 ]
 
 instrument_hooks_cflags_windows = [
+    "/std:c11",
     "/wd4101",  # unreferenced local variable (equivalent to -Wno-unused-variable)
     "/wd4189",  # local variable is initialized but not referenced (equivalent to -Wno-unused-but-set-variable)
     "/wd4100",  # unreferenced formal parameter (equivalent to -Wno-unused-parameter)
@@ -66,8 +67,8 @@ cc_library(
     copts = select({
         ":windows_strict_warnings": ["/W4","/WX"] + instrument_hooks_cflags_windows,
         ":windows": instrument_hooks_cflags_windows,
-        ":strict_warnings_enabled": ["-Wall", "-Werror"] + instrument_hooks_cflags,
-        "//conditions:default": instrument_hooks_cflags,
+        ":strict_warnings_enabled": ["-std=c11", "-Wall", "-Werror"] + instrument_hooks_cflags,
+        "//conditions:default": ["-std=c11"] + instrument_hooks_cflags,
     }),
     visibility = ["//visibility:public"],
 )

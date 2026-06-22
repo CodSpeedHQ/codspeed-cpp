@@ -27,6 +27,13 @@ set(instrument_hooks_SOURCE_DIR ${instrument_hooks_repo_SOURCE_DIR})
 # Add the instrument_hooks library
 add_library(instrument_hooks STATIC ${instrument_hooks_SOURCE_DIR}/dist/core.c)
 
+# Pin C11: the Zig-generated core.c is rejected under C23 (e.g. GCC 15's default),
+# which mangles [[noreturn]] placement in the embedded zig.h.
+set_target_properties(
+    instrument_hooks
+    PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED ON
+)
+
 target_include_directories(
     instrument_hooks
     PUBLIC
