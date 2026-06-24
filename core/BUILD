@@ -42,6 +42,9 @@ instrument_hooks_cflags = [
     "-Wno-unused-const-variable",
     "-Wno-type-limits",
     "-Wno-uninitialized",
+    # Older Clang lacks -Wunterminated-string-initialization; tolerate the unknown flag.
+    "-Wno-unknown-warning-option",
+    "-Wno-unterminated-string-initialization",
     # When cross-compiling:
     "-Wno-constant-conversion",
     "-Wno-incompatible-pointer-types",

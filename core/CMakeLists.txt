@@ -54,6 +54,9 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         -Wno-unused-const-variable
         -Wno-type-limits
         -Wno-uninitialized
+        # Older Clang lacks -Wunterminated-string-initialization; tolerate the unknown flag.
+        -Wno-unknown-warning-option
+        -Wno-unterminated-string-initialization
         # When cross-compiling:
         -Wno-constant-conversion
         -Wno-incompatible-pointer-types
