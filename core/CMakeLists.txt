@@ -217,22 +217,32 @@ if(NOT CODSPEED_MODE STREQUAL "off")
     endif()
 endif()
 
-install(
-    DIRECTORY "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include"
-    DESTINATION /usr/local
-    FILES_MATCHING
-    PATTERN "*.h"
-    PATTERN "*.hpp"
-)
+# Use GNUInstallDirs so destinations respect CMAKE_INSTALL_PREFIX instead of a
+# hardcoded absolute path.
+include(GNUInstallDirs)
 
-install(
-    TARGETS codspeed instrument_hooks
-    EXPORT codspeed-targets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
+if(NOT DEFINED BENCHMARK_ENABLE_INSTALL)
+    set(BENCHMARK_ENABLE_INSTALL ON)
+endif()
+
+if(BENCHMARK_ENABLE_INSTALL)
+    install(
+        DIRECTORY "${PROJECT_SOURCE_DIR}/include/" "${PROJECT_BINARY_DIR}/include/"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN "*.hpp"
+    )
+
+    install(
+        TARGETS codspeed instrument_hooks
+        EXPORT codspeed-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+endif()
 
 message(STATUS "Codspeed mode: ${CODSPEED_MODE}")
 
