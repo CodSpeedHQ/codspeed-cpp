@@ -1074,16 +1074,7 @@ struct State::StateIterator {
     if (BENCHMARK_BUILTIN_EXPECT(cached_ != 0, true)) {
       return true;
     }
-#ifdef CODSPEED_ANALYSIS
-    measurement_stop();
-#endif
     parent_->FinishKeepRunning();
-
-#ifdef CODSPEED_ANALYSIS
-    if (parent_->codspeed_ != NULL) {
-      parent_->codspeed_->end_benchmark();
-    }
-#endif
     return false;
   }
 
@@ -1096,16 +1087,7 @@ inline BENCHMARK_ALWAYS_INLINE State::StateIterator State::begin() {
   return StateIterator(this);
 }
 inline BENCHMARK_ALWAYS_INLINE State::StateIterator State::end() {
-#ifdef CODSPEED_ANALYSIS
-  if (this->codspeed_ != NULL) {
-    this->codspeed_->start_benchmark(name_);
-  }
-#endif
-
   StartKeepRunning();
-#ifdef CODSPEED_ANALYSIS
-  measurement_start();
-#endif
   return StateIterator();
 }
 
