@@ -354,6 +354,11 @@ void State::SetLabel(const std::string& label) {
 }
 
 void State::StartKeepRunning() {
+#ifdef CODSPEED_ANALYSIS
+  if (codspeed_ != NULL) {
+    codspeed_->start_benchmark(name_);
+  }
+#endif
   BM_CHECK(!started_ && !finished_);
   started_ = true;
   total_iterations_ = skipped() ? 0 : max_iterations;
@@ -364,9 +369,15 @@ void State::StartKeepRunning() {
   if (!skipped()) {
     ResumeTiming();
   }
+#ifdef CODSPEED_ANALYSIS
+  measurement_start();
+#endif
 }
 
 void State::FinishKeepRunning() {
+#ifdef CODSPEED_ANALYSIS
+  measurement_stop();
+#endif
   BM_CHECK(started_ && (!finished_ || skipped()));
   if (!skipped()) {
     PauseTiming();
@@ -378,6 +389,11 @@ void State::FinishKeepRunning() {
   if (BENCHMARK_BUILTIN_EXPECT(profiler_manager_ != nullptr, false)) {
     profiler_manager_->BeforeTeardownStop();
   }
+#ifdef CODSPEED_ANALYSIS
+  if (codspeed_ != NULL) {
+    codspeed_->end_benchmark();
+  }
+#endif
 }
 
 namespace internal {
