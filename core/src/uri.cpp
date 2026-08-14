@@ -1,9 +1,21 @@
-#include <iostream>
 #include <string>
 
 #include "codspeed.h"
 
 namespace codspeed {
+
+// The anonymous namespace is not a part of any identifier the benchmark can be referred to by,
+// and its spelling differs between the compilers, so it is dropped from the namespace path.
+// Example: {anonymous}::outer:: (GCC) or (anonymous namespace)::outer:: (clang)
+// Returns: outer::
+std::string strip_anonymous_namespace(std::string ns) {
+  for (const std::string anon : {"{anonymous}::", "(anonymous namespace)::"}) {
+    for (auto pos = ns.find(anon); pos != std::string::npos; pos = ns.find(anon)) {
+      ns.erase(pos, anon.size());
+    }
+  }
+  return ns;
+}
 
 // Example: auto outer::test12::(anonymous class)::operator()() const
 // Returns: outer::test12::
@@ -36,16 +48,10 @@ std::string extract_namespace_gcc(const std::string &pretty_func) {
 // Returns: An empty string if the namespace could not be extracted,
 //         otherwise the namespace with a trailing "::"
 std::string extract_lambda_namespace(const std::string &pretty_func) {
-  if (pretty_func.find("(anonymous namespace)") != std::string::npos) {
-    std::cerr << "[ERROR] Anonymous namespace not supported in " << pretty_func
-              << std::endl;
-    return {};
-  }
-
 #ifdef __clang__
-  return extract_namespace_clang(pretty_func);
+  return strip_anonymous_namespace(extract_namespace_clang(pretty_func));
 #elif __GNUC__
-  return extract_namespace_gcc(pretty_func);
+  return strip_anonymous_namespace(extract_namespace_gcc(pretty_func));
 #elif _MSC_VER
   // MSVC doesn't support __PRETTY_FUNCTION__ in the same way
   // Return empty string as fallback for Windows
