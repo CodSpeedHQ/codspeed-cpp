@@ -124,7 +124,7 @@ class BenchmarkRunner {
 
   void RunWarmUp();
 
-#ifdef CODSPEED_WALLTIME
+#if defined(CODSPEED_WALLTIME) || defined(CODSPEED_ANALYSIS)
 public:  
   inline std::string GetBenchmarkName() {
     return b.name().str();
