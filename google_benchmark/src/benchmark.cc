@@ -20,6 +20,7 @@
 #include "internal_macros.h"
 
 #include "measurement.hpp"
+#include "isolation.h"
 
 #ifndef BENCHMARK_OS_WINDOWS
 #if !defined(BENCHMARK_OS_FUCHSIA) && !defined(BENCHMARK_OS_QURT)
@@ -464,9 +465,19 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
   // Note the file_reporter can be null.
   BM_CHECK(display_reporter != nullptr);
 
+#ifdef CODSPEED_ANALYSIS
+  const codspeed::Isolation& isolation = codspeed::Isolation::current();
+  // Process isolation children only run one benchmark. The parent already
+  // printed the mode and the context.
+  const bool is_isolated_child = isolation.only_benchmark() != nullptr;
+#endif
+
 #ifdef CODSPEED_ENABLED
   auto& Err = display_reporter->GetErrorStream();
-  Err << "Codspeed mode: " << CODSPEED_MODE_DISPLAY << "\n";
+#ifdef CODSPEED_ANALYSIS
+  if (!is_isolated_child)
+#endif
+    Err << "Codspeed mode: " << CODSPEED_MODE_DISPLAY << "\n";
 #endif  // CODSPEED_ENABLED
 
   bool might_have_aggregates = FLAGS_benchmark_repetitions > 1;
@@ -493,8 +504,18 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
   std::map<int /*family_index*/, BenchmarkReporter::PerFamilyRunReports>
       per_family_reports;
 
-  if (display_reporter->ReportContext(context) &&
-      ((file_reporter == nullptr) || file_reporter->ReportContext(context))) {
+#ifdef CODSPEED_ANALYSIS
+  const bool context_reported =
+      is_isolated_child ||
+      (display_reporter->ReportContext(context) &&
+       ((file_reporter == nullptr) || file_reporter->ReportContext(context)));
+#else
+  const bool context_reported =
+      display_reporter->ReportContext(context) &&
+      ((file_reporter == nullptr) || file_reporter->ReportContext(context));
+#endif
+
+  if (context_reported) {
     FlushStreams(display_reporter);
     FlushStreams(file_reporter);
 
@@ -561,8 +582,24 @@ void RunBenchmarks(const std::vector<BenchmarkInstance>& benchmarks,
 #ifdef CODSPEED_WALLTIME
     std::vector<codspeed::RawWalltimeBenchmark> codspeed_walltime_data;
 #endif
+#ifdef CODSPEED_ANALYSIS
+    // The child of a benchmark runs all of its repetitions, so the parent
+    // starts only one child per benchmark.
+    std::vector<bool> isolated(runners.size(), false);
+#endif
     for (size_t repetition_index : repetition_indices) {
       internal::BenchmarkRunner& runner = runners[repetition_index];
+
+#ifdef CODSPEED_ANALYSIS
+      if (isolation.kind() == codspeed::Isolation::Kind::ProcessPerBenchmark) {
+        if (!isolated[repetition_index]) {
+          isolated[repetition_index] = true;
+          isolation.run(runner.GetBenchmarkName(),
+                        [&runner]() { runner.DoOneRepetition(); });
+        }
+        continue;
+      }
+#endif
 
 #ifdef CODSPEED_WALLTIME
       auto* codspeed = codspeed::CodSpeed::getInstance();
@@ -954,6 +991,13 @@ void PrintDefaultHelp() {
 }
 
 void Initialize(int* argc, char** argv, void (*HelperPrintf)()) {
+#ifdef CODSPEED_ANALYSIS
+  // Keep the full command line: parsing below removes the benchmark flags, and
+  // process isolation starts the children with the original arguments.
+  codspeed::Isolation::set_argv(*argc, argv);
+  // Reject an invalid CODSPEED_PROCESS_ISOLATION before running anything.
+  codspeed::Isolation::current();
+#endif
   internal::HelperPrintf = HelperPrintf;
   internal::ParseCommandLineFlags(argc, argv);
   internal::LogLevel() = FLAGS_v;
