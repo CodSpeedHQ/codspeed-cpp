@@ -5,6 +5,16 @@
 
 
 
+## [3.0.0] - 2026-11-20
+
+### <!-- 1 -->🐛 Bug Fixes
+- Exclude paused sections from instrumentation measurement
+
+### <!-- 10 -->💼 Other
+- Suppress -Wunterminated-string-initialization for instrument-hooks core.c
+- Pin -std=c11 for instrument-hooks core.c
+
+
 ## [2.4.0] - 2026-06-04
 
 ### <!-- 0 -->🚀 Features
@@ -243,6 +253,7 @@
 - Import google benchmark "fork"
 
 
+[3.0.0]: https://github.com/CodSpeedHQ/runner/compare/v2.4.0..v3.0.0
 [2.4.0]: https://github.com/CodSpeedHQ/runner/compare/v2.3.0..v2.4.0
 [2.3.0]: https://github.com/CodSpeedHQ/runner/compare/v2.2.0..v2.3.0
 [2.2.0]: https://github.com/CodSpeedHQ/runner/compare/v2.1.0..v2.2.0
