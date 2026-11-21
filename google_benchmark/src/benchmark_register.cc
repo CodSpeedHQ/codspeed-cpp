@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include "benchmark_register.h"
+#ifdef CODSPEED_ANALYSIS
+#include "isolation.h"
+#endif
 
 #ifndef BENCHMARK_OS_WINDOWS
 #if !defined(BENCHMARK_OS_FUCHSIA) && !defined(BENCHMARK_OS_QURT)
@@ -172,9 +175,17 @@ bool BenchmarkFamilies::FindBenchmarks(
                                    num_threads);
 
         const auto full_name = instance.name().str();
-        if (full_name.rfind(kDisabledPrefix, 0) != 0 &&
-            ((re.Match(full_name) && !is_negative_filter) ||
-             (!re.Match(full_name) && is_negative_filter))) {
+        bool matches_filter = (re.Match(full_name) && !is_negative_filter) ||
+                              (!re.Match(full_name) && is_negative_filter);
+#ifdef CODSPEED_ANALYSIS
+        // A process isolation child runs exactly one benchmark, whatever the
+        // command line filter says.
+        if (const std::string* only =
+                codspeed::Isolation::current().only_benchmark()) {
+          matches_filter = full_name == *only;
+        }
+#endif
+        if (full_name.rfind(kDisabledPrefix, 0) != 0 && matches_filter) {
           benchmarks->push_back(std::move(instance));
 
           ++per_family_instance_index;

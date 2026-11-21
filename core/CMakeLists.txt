@@ -85,6 +85,7 @@ endif()
 add_library(
     codspeed
     src/codspeed.cpp
+    src/isolation.cpp
     src/measurement.cpp
     src/walltime.cpp
     src/uri.cpp

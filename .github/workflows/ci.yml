@@ -102,6 +102,22 @@ jobs:
           mode: ${{ matrix.codspeed-mode }}
           run: examples/google_benchmark_cmake/build/benchmark_example
 
+  process-isolation-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: "recursive"
+
+      - name: Build and run the process isolation test
+        run: |
+          mkdir -p tests/process_isolation/build
+          cd tests/process_isolation/build
+          cmake -DCODSPEED_MODE=simulation -DCODSPEED_STRICT_WARNINGS=ON ..
+          make -j
+          ctest --output-on-failure
+
   bazel-integration-tests:
     strategy:
       matrix:

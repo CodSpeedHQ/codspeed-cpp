@@ -1,0 +1,18 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name = "process_isolation_fixture",
+    srcs = ["main.cpp"],
+    copts = ["-Wall", "-Wextra", "-Werror"],
+    linkopts = ["-pthread"],
+    deps = ["@codspeed_google_benchmark_compat//:benchmark"],
+)
+
+# Run with --@codspeed_core//:codspeed_mode=simulation (or another analysis
+# mode), process isolation does not exist in the other modes.
+sh_test(
+    name = "process_isolation_test",
+    srcs = ["run_test.sh"],
+    args = ["$(location :process_isolation_fixture)"],
+    data = [":process_isolation_fixture"],
+)
