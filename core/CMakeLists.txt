@@ -168,6 +168,20 @@ target_compile_definitions(
 
 message(STATUS "Using codspeed root directory: ${CODSPEED_ROOT_DIR}")
 
+# Gives each benchmark file the directory its compiler runs in. Some tools,
+# such as ccache with `base_dir`, make `__FILE__` relative to that directory.
+# Ninja runs every compiler in the top build directory; Makefiles run it in
+# the build directory of the target that owns the file.
+if(CMAKE_GENERATOR MATCHES "Ninja")
+    set(CODSPEED_COMPILE_DIR "${CMAKE_BINARY_DIR}")
+else()
+    set(CODSPEED_COMPILE_DIR "$<TARGET_PROPERTY:BINARY_DIR>")
+endif()
+target_compile_definitions(
+    codspeed
+    INTERFACE -DCODSPEED_COMPILE_DIR="${CODSPEED_COMPILE_DIR}"
+)
+
 set(CODSPEED_MODE_ALLOWED_VALUES
     "off"
     "instrumentation"

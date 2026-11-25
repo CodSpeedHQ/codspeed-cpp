@@ -47,8 +47,11 @@ std::string extract_lambda_namespace(const std::string &pretty_func);
 std::string sanitize_bench_args(std::string &text);
 
 // Gets path relative to workspace root, expected to be called with __FILE__ as
-// an argument
-std::string get_path_relative_to_workspace(const std::string &path);
+// an argument. A relative `path` is resolved against `compile_dir`, the
+// directory the compiler ran in, when the file exists there. Otherwise it is
+// resolved against the current directory.
+std::string get_path_relative_to_workspace(const std::string &path,
+                                           const std::string &compile_dir = "");
 
 }  // namespace codspeed
 

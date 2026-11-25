@@ -1481,7 +1481,14 @@ class Fixture : public internal::Benchmark {
   static ::benchmark::internal::Benchmark const* const BENCHMARK_PRIVATE_NAME(n)
 
 #ifdef CODSPEED_ENABLED
+#ifdef CODSPEED_COMPILE_DIR
+#define CUR_FILE                                                   \
+  codspeed::get_path_relative_to_workspace(__FILE__,               \
+                                           CODSPEED_COMPILE_DIR) + \
+      "::"
+#else
 #define CUR_FILE codspeed::get_path_relative_to_workspace(__FILE__) + "::"
+#endif
 #ifdef _MSC_VER
 // TODO: __PRETTY_FUNCTION__ is not available in MSVC and we dont support
 #define __PRETTY_FUNCTION__ "unsupported"

@@ -6,7 +6,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_executable(unit_tests uri.cpp codspeed.cpp walltime.cpp)
+add_executable(unit_tests uri.cpp codspeed.cpp walltime.cpp workspace.cpp)
+
+# Gives the tests the root that get_path_relative_to_workspace uses
+target_compile_definitions(
+    unit_tests
+    PRIVATE CODSPEED_TEST_ROOT_DIR="${CODSPEED_ROOT_DIR}"
+)
 
 target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
