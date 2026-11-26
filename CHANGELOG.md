@@ -5,6 +5,19 @@
 
 
 
+## [3.0.1] - 2026-11-26
+
+### <!-- 1 -->🐛 Bug Fixes
+- Resolve relative __FILE__ against the compiler's directory
+
+### <!-- 10 -->💼 Other
+- Keep CODSPEED_COMPILE_DIR out of the installed package
+
+### <!-- 7 -->⚙️ Internals
+- Install clang-format from the pre-commit mirror (#59)
+- Use the released runner in the macOS walltime jobs
+
+
 ## [3.0.0] - 2026-11-20
 
 ### <!-- 1 -->🐛 Bug Fixes
@@ -253,6 +266,7 @@
 - Import google benchmark "fork"
 
 
+[3.0.1]: https://github.com/CodSpeedHQ/runner/compare/v3.0.0..v3.0.1
 [3.0.0]: https://github.com/CodSpeedHQ/runner/compare/v2.4.0..v3.0.0
 [2.4.0]: https://github.com/CodSpeedHQ/runner/compare/v2.3.0..v2.4.0
 [2.3.0]: https://github.com/CodSpeedHQ/runner/compare/v2.2.0..v2.3.0
