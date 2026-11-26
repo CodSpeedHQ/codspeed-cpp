@@ -227,8 +227,6 @@ jobs:
         with:
           run: examples/google_benchmark_cmake/build/benchmark_example --benchmark_filter=BM_FibonacciRecursive_Darwin
           mode: walltime
-          # TODO: Remove this once the runner has been released with macos support
-          runner-version: branch:main
 
   macos-walltime-bazel-test:
     runs-on: macos-latest
@@ -259,4 +257,3 @@ jobs:
           # BUILD_WORKSPACE_DIRECTORY is normally set by `bazel run`; we set it manually so workspace-relative __FILE__ resolution works when invoking the binary directly.
           run: BUILD_WORKSPACE_DIRECTORY=$PWD ./bazel-bin/examples/google_benchmark_bazel/my_benchmark --benchmark_filter=BM_FibonacciRecursive_Darwin
           mode: walltime
-          runner-version: branch:main
