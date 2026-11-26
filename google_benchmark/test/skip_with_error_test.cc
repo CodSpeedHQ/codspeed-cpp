@@ -181,6 +181,15 @@ ADD_CASES("BM_error_while_paused", {{"/1/threads:1", true, "error message"},
                                     {"/2/threads:4", false, ""},
                                     {"/2/threads:8", false, ""}});
 
+void BM_malformed(benchmark::State&) {
+  // NOTE: empty body wanted. No thing else.
+}
+BENCHMARK(BM_malformed);
+ADD_CASES("BM_malformed",
+          {{"", true,
+            "The benchmark didn't run, nor was it explicitly skipped. Please "
+            "call 'SkipWithXXX` in your benchmark as appropriate."}});
+
 int main(int argc, char* argv[]) {
   benchmark::Initialize(&argc, argv);
 
