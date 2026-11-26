@@ -172,6 +172,8 @@ message(STATUS "Using codspeed root directory: ${CODSPEED_ROOT_DIR}")
 # such as ccache with `base_dir`, make `__FILE__` relative to that directory.
 # Ninja runs every compiler in the top build directory; Makefiles run it in
 # the build directory of the target that owns the file.
+# The installed package doesn't get it: this directory belongs to the build
+# that compiles codspeed, not to the project that uses the package.
 if(CMAKE_GENERATOR MATCHES "Ninja")
     set(CODSPEED_COMPILE_DIR "${CMAKE_BINARY_DIR}")
 else()
@@ -179,7 +181,7 @@ else()
 endif()
 target_compile_definitions(
     codspeed
-    INTERFACE -DCODSPEED_COMPILE_DIR="${CODSPEED_COMPILE_DIR}"
+    INTERFACE $<BUILD_INTERFACE:CODSPEED_COMPILE_DIR="${CODSPEED_COMPILE_DIR}">
 )
 
 set(CODSPEED_MODE_ALLOWED_VALUES
